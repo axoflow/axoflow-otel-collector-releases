@@ -32,7 +32,8 @@ const ArmArch = "arm"
 
 var (
 	ImagePrefixes = []string{"ghcr.io/axoflow/axoflow-otel-collector"}
-	Architectures = []string{"amd64", "arm64"}
+	// Architectures = []string{"amd64", "arm64"}
+	Architectures = []string{"amd64"}
 	ArmVersions   = []string{}
 )
 
@@ -69,9 +70,12 @@ func Build(dist string) config.Build {
 			Flags:   []string{"-trimpath"},
 			Ldflags: []string{"-s", "-w"},
 		},
-		Goos:   []string{"linux"},
+		Goos:   []string{"linux", "windows"},
 		Goarch: Architectures,
 		Goarm:  ArmVersions,
+		Ignore: []config.IgnoredBuild{
+			{Goos: "windows", Goarch: "arm64"},
+		},
 	}
 }
 
