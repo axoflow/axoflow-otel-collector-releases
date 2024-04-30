@@ -14,7 +14,7 @@ jobs:
 
     strategy:
       matrix:
-        GOOS: [linux]
+        GOOS: [linux, windows]
     runs-on: ubuntu-20.04
 
     steps:
