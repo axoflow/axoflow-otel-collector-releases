@@ -48,12 +48,8 @@ replaces:
   - github.com/openshift/api => github.com/openshift/api v0.0.0-20230726162818-81f778f3b3ec
   - github.com/IBM/fluent-forward-go => github.com/IBM/fluent-forward-go v0.2.3-0.20240418091724-720f8df4306a
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector =>  github.com/kristofgyuracz/opentelemetry-collector-contrib/connector/countconnector v0.98.0-dev5
-  - go.opentelemetry.io/collector/exporter/debugexporter => github.com/overorion/opentelemetry-collector/exporter/debugexporter v0.98.0-bytesboth
-  - go.opentelemetry.io/collector/pdata/plog => github.com/overorion/opentelemetry-collector/pdata/plog v0.98.0-bytesboth
+  - go.opentelemetry.io/collector/exporter => github.com/overorion/opentelemetry-collector/exporter v0.98.0-bytesboth
   - go.opentelemetry.io/collector/pdata => github.com/overorion/opentelemetry-collector/pdata v0.98.0-bytesboth
-  #  - go.opentelemetry.io/collector/pdata/plog => /home/orion/work/others/open-telemetry/opentelemetry-collector/pdata/plog
-  #  - go.opentelemetry.io/collector/pdata => /home/orion/work/others/open-telemetry/opentelemetry-collector/pdata
-  - go.opentelemetry.io/collector/receiver => /home/orion/work/others/open-telemetry/opentelemetry-collector/receiver
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver => /home/orion/work/others/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver
-  - github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza => /home/orion/work/others/open-telemetry/opentelemetry-collector-contrib/pkg/stanza
+  - go.opentelemetry.io/collector/receiver => github.com/overorion/opentelemetry-collector/receiver v0.98.0-bytesboth
+  - github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza => github.com/overorion/opentelemetry-collector-contrib/pkg/stanza v0.98.0-bytesboth
 
