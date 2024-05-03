@@ -37,6 +37,8 @@ jobs:
 
       - name: Generate distribution sources
         run: make generate-sources
+        env:
+          GOSUMDB: off
 
       - name: Login to GitHub Package Registry
         uses: docker/login-action@v3
@@ -59,6 +61,8 @@ jobs:
           GOOS: ${{ matrix.GOOS }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COSIGN_EXPERIMENTAL: true
+          # TEMPORARY
+          GOSUMDB: off 
 
       - uses: actions/upload-artifact@v4
         with:
