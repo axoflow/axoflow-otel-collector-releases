@@ -48,8 +48,9 @@ replaces:
   - github.com/openshift/api => github.com/openshift/api v0.0.0-20230726162818-81f778f3b3ec
   - github.com/IBM/fluent-forward-go => github.com/IBM/fluent-forward-go v0.2.3-0.20240418091724-720f8df4306a
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector =>  github.com/kristofgyuracz/opentelemetry-collector-contrib/connector/countconnector v0.98.0-dev5
-  - go.opentelemetry.io/collector/exporter => github.com/overorion/opentelemetry-collector/exporter v0.98.0-bytesboth
-  - go.opentelemetry.io/collector/pdata => github.com/overorion/opentelemetry-collector/pdata v0.98.0-bytesboth
-  - go.opentelemetry.io/collector/receiver => github.com/overorion/opentelemetry-collector/receiver v0.98.0-bytesboth
-  - github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza => github.com/overorion/opentelemetry-collector-contrib/pkg/stanza v0.98.0-bytesboth
+  - go.opentelemetry.io/collector => github.com/overorion/opentelemetry-collector v0.98.0-bytesbothsizer
+  - go.opentelemetry.io/collector/exporter => github.com/overorion/opentelemetry-collector/exporter v0.98.0-bytesbothsizer
+  - go.opentelemetry.io/collector/pdata => github.com/overorion/opentelemetry-collector/pdata v0.98.0-bytesbothsizer
+  - go.opentelemetry.io/collector/receiver => github.com/overorion/opentelemetry-collector/receiver v0.98.0-bytesbothsizer
+  - github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza => github.com/overorion/opentelemetry-collector-contrib/pkg/stanza v0.98.0-bytesbothsizer2
 
