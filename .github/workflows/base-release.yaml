@@ -95,6 +95,10 @@ jobs:
     name: ${{ inputs.distribution }} Release
     runs-on: ubuntu-24.04
     needs: prepare
+    strategy:
+      matrix:
+        GOOS: ${{ fromJSON( inputs.goos) }}
+        GOARCH: ${{ fromJSON( inputs.goarch) }}
 
     permissions:
       id-token: write
