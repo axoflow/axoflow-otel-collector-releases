@@ -3,7 +3,7 @@ project_name: axoflow-otel-collector-releases
 env:
   - COSIGN_YES=true
 release:
-  disable: "true"
+  replace_existing_artifacts: true
 msi:
   - id: axoflow-otel-collector
     name: axoflow-otel-collector_{{ .Version }}_{{ .Os }}_{{ .MsiArch }}
