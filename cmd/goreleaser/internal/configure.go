@@ -29,6 +29,7 @@ import (
 
 const (
 	ArmArch    = "arm"
+	Arm64Arch  = "arm64"
 	CoreDistro = "otelcol"
 	ImageName  = "axoflow-otel-collector"
 )
@@ -36,6 +37,7 @@ const (
 var (
 	ImagePrefixes      = []string{"ghcr.io/axoflow/axoflow-otel-collector"}
 	Architectures      = []string{"amd64", "arm64"}
+	Arm64Versions      = []string{"v8.0"}
 	Goos               = []string{"linux", "windows"}
 	DefaultConfigDists = map[string]bool{ImageName: true}
 	MSIWindowsDists    = map[string]bool{ImageName: true}
@@ -88,8 +90,9 @@ func Build(dist string) config.Build {
 			Flags:   []string{"-trimpath"},
 			Ldflags: []string{"-s", "-w"},
 		},
-		Goos:   Goos,
-		Goarch: Architectures,
+		Goos:    Goos,
+		Goarch:  Architectures,
+		Goarm64: Arm64Versions,
 		Ignore: []config.IgnoredBuild{
 			{Goos: "windows", Goarch: "arm64"},
 		},
@@ -194,7 +197,14 @@ func Package(dist string) config.NFPM {
 func DockerImages(dist string) []config.Docker {
 	r := make([]config.Docker, 0)
 	for _, arch := range Architectures {
-		r = append(r, DockerImage(dist, arch, ""))
+		switch arch {
+		case Arm64Arch:
+			for _, vers := range Arm64Versions {
+				r = append(r, DockerImage(dist, arch, vers))
+			}
+		default:
+			r = append(r, DockerImage(dist, arch, ""))
+		}
 	}
 	return r
 }
@@ -203,9 +213,13 @@ func DockerImages(dist string) []config.Docker {
 // https://goreleaser.com/customization/docker/
 func DockerImage(dist, arch, armVersion string) config.Docker {
 	dockerArchName := archName(arch, armVersion)
+	dockerArchTag := dockerArchName
 	imageTemplates := make([]string, 0)
 	for _, prefix := range ImagePrefixes {
-		dockerArchTag := strings.ReplaceAll(dockerArchName, "/", "")
+		switch arch {
+		case Arm64Arch:
+			dockerArchTag = strings.ReplaceAll(dockerArchName, "/", "_")
+		}
 		imageTemplates = append(
 			imageTemplates,
 			fmt.Sprintf("%s/%s:{{ .Version }}-%s", prefix, imageName(dist), dockerArchTag),
@@ -256,10 +270,21 @@ func DockerManifests(dist string) []config.DockerManifest {
 func DockerManifest(prefix, version, dist string) config.DockerManifest {
 	var imageTemplates []string
 	for _, arch := range Architectures {
-		imageTemplates = append(
-			imageTemplates,
-			fmt.Sprintf("%s/%s:%s-%s", prefix, imageName(dist), version, arch),
-		)
+		switch arch {
+		case Arm64Arch:
+			for _, arm64Vers := range Arm64Versions {
+				dockerArchTag := strings.ReplaceAll(archName(arch, arm64Vers), "/", "_")
+				imageTemplates = append(
+					imageTemplates,
+					fmt.Sprintf("%s/%s:%s-%s", prefix, imageName(dist), version, dockerArchTag),
+				)
+			}
+		default:
+			imageTemplates = append(
+				imageTemplates,
+				fmt.Sprintf("%s/%s:%s-%s", prefix, imageName(dist), version, arch),
+			)
+		}
 	}
 
 	return config.DockerManifest{
@@ -278,6 +303,8 @@ func archName(arch, armVersion string) string {
 	switch arch {
 	case ArmArch:
 		return fmt.Sprintf("%s/v%s", arch, armVersion)
+	case Arm64Arch:
+		return fmt.Sprintf("%s/%s", arch, armVersion)
 	default:
 		return arch
 	}
