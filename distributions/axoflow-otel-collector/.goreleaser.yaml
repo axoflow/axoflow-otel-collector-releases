@@ -20,8 +20,6 @@ builds:
     goarch:
       - amd64
       - arm64
-    goarm:
-      - "7"
     ignore:
       - goos: darwin
         goarch: "386"

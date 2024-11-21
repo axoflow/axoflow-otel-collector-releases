@@ -36,7 +36,7 @@ const (
 var (
 	ImagePrefixes      = []string{"ghcr.io/axoflow/axoflow-otel-collector"}
 	Architectures      = []string{"amd64", "arm64"}
-	ArmVersions        = []string{"7"}
+	ArmVersions        = []string{}
 	DefaultConfigDists = map[string]bool{ImageName: true}
 	MSIWindowsDists    = map[string]bool{ImageName: true}
 )

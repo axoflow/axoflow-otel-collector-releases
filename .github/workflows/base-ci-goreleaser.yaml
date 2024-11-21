@@ -46,7 +46,7 @@ jobs:
       - name: Setup QEMU
         uses: docker/setup-qemu-action@v3
         with:
-          platforms: arm64,linux/arm/v7
+          platforms: arm64
 
       - name: Setup wixl # Required to build MSI packages for Windows
         if: ${{ matrix.GOOS == 'windows' && matrix.GOARCH == 'amd64' }}
