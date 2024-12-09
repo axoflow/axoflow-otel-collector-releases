@@ -19,7 +19,7 @@ exporters:
   - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.112.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.112.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusexporter v0.112.0
-  - gomod: github.com/axoflow/fluentforwardexporter v0.112.0
+  - gomod: github.com/axoflow/fluentforwardexporter v0.112.0-dev3
 
 processors:
   - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.112.0
