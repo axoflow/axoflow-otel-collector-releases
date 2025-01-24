@@ -52,7 +52,6 @@ install_pkg "$container_name" "$PKG_PATH"
 
 # ensure service has started and still running after 5 seconds
 sleep 5
-
 echo "Checking $SERVICE_NAME service status ..."
 $container_exec systemctl --no-pager status "$SERVICE_NAME"
 
