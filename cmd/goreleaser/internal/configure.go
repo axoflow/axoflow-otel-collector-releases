@@ -90,9 +90,6 @@ func Build(dist string) config.Build {
 		},
 		Goos:   Goos,
 		Goarch: Architectures,
-		Ignore: []config.IgnoredBuild{
-			{Goos: "windows", Goarch: "arm64"},
-		},
 	}
 }
 
