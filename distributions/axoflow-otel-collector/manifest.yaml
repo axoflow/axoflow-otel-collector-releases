@@ -57,4 +57,4 @@ replaces:
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/countconnector v0.112.0
   # TODO: remove pdata replace once we've reached version where profiles signals are available
   - go.opentelemetry.io/collector/pdata => go.opentelemetry.io/collector/pdata v1.20.0
-  - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.112.0-bytes-dev
+  - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.112.0
