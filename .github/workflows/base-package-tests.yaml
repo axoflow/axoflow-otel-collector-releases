@@ -1,4 +1,4 @@
-name: Package Tests
+name: Reusable Package Tests
 
 on:
   workflow_call:

@@ -39,6 +39,7 @@ var (
 	Goos               = []string{"linux", "windows"}
 	DefaultConfigDists = map[string]bool{ImageName: true}
 	MSIWindowsDists    = map[string]bool{ImageName: true}
+	Partial            = config.Partial{By: "target"}
 )
 
 func Generate(dist string) config.Project {
@@ -61,9 +62,7 @@ func Generate(dist string) config.Project {
 		Monorepo: config.Monorepo{
 			TagPrefix: "v",
 		},
-		Partial: config.Partial{
-			By: "target",
-		},
+		Partial: Partial,
 		Release: config.Release{
 			ReplaceExistingArtifacts: true,
 		},
@@ -93,7 +92,7 @@ func Build(dist string) config.Build {
 	}
 }
 
-func Archives(dist string) (r []config.Archive) {
+func Archives(dist string) []config.Archive {
 	return []config.Archive{
 		Archive(dist),
 	}
@@ -104,14 +103,14 @@ func Archives(dist string) (r []config.Archive) {
 func Archive(dist string) config.Archive {
 	return config.Archive{
 		ID:           dist,
-		NameTemplate: "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}",
+		NameTemplate: "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}",
 		Builds:       []string{dist},
 	}
 }
 
 func WinPackages(dist string) []config.MSI {
 	if _, ok := MSIWindowsDists[dist]; !ok {
-		return []config.MSI{}
+		return nil
 	}
 	return []config.MSI{
 		WinPackage(dist),
@@ -133,7 +132,7 @@ func WinPackage(dist string) config.MSI {
 	}
 }
 
-func Packages(dist string) (r []config.NFPM) {
+func Packages(dist string) []config.NFPM {
 	return []config.NFPM{
 		Package(dist),
 	}
@@ -142,7 +141,7 @@ func Packages(dist string) (r []config.NFPM) {
 // Package configures goreleaser to build a system package.
 // https://goreleaser.com/customization/nfpm/
 func Package(dist string) config.NFPM {
-	nfpmContents := config.NFPMContents{
+	nfpmContents := []config.NFPMContent{
 		{
 			Source:      fmt.Sprintf("%s.service", ImageName),
 			Destination: path.Join("/lib", "systemd", "system", fmt.Sprintf("%s.service", dist)),
@@ -154,28 +153,24 @@ func Package(dist string) config.NFPM {
 		},
 	}
 	if _, ok := DefaultConfigDists[dist]; ok {
-		nfpmContents = append(nfpmContents, &config.NFPMContent{
+		nfpmContents = append(nfpmContents, config.NFPMContent{
 			Source:      "config.yaml",
 			Destination: path.Join("/etc", dist, "config.yaml"),
 			Type:        "config|noreplace",
 		})
 	}
 	return config.NFPM{
-		ID:      dist,
-		Builds:  []string{dist},
-		Formats: []string{"deb", "rpm"},
-
+		ID:          dist,
+		Builds:      []string{dist},
+		Formats:     []string{"deb", "rpm"},
 		License:     "Apache 2.0",
 		Description: fmt.Sprintf("OpenTelemetry Collector - %s", dist),
 		Maintainer:  "The OpenTelemetry Collector maintainers <cncf-opentelemetry-maintainers@lists.cncf.io>",
 		Overrides: map[string]config.NFPMOverridables{
 			"rpm": {
-				Dependencies: []string{
-					"/bin/sh",
-				},
+				Dependencies: []string{"/bin/sh"},
 			},
 		},
-
 		NFPMOverridables: config.NFPMOverridables{
 			PackageName: dist,
 			Scripts: config.NFPMScripts{
@@ -189,7 +184,7 @@ func Package(dist string) config.NFPM {
 }
 
 func DockerImages(dist string) []config.Docker {
-	r := make([]config.Docker, 0)
+	var r []config.Docker
 	for _, arch := range Architectures {
 		r = append(r, DockerImage(dist, arch, ""))
 	}
