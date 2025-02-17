@@ -152,7 +152,7 @@ func expectedServiceCommand(t *testing.T, serviceName, collectorServiceArgs stri
 	programFilesDir := os.Getenv("PROGRAMFILES")
 	require.NotEmpty(t, programFilesDir, "PROGRAMFILES environment variable is not set")
 
-	collectorDir := filepath.Join(programFilesDir, "Axoflow OpenTelemetry Collector")
+	collectorDir := filepath.Join(programFilesDir, "Axoflow", "OpenTelemetry Collector")
 	collectorExe := filepath.Join(collectorDir, serviceName) + ".exe"
 
 	if collectorServiceArgs == "" {
