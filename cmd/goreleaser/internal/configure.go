@@ -120,7 +120,7 @@ func WinPackages(dist string) []config.MSI {
 // Package configures goreleaser to build a Windows MSI package.
 // https://goreleaser.com/customization/msi/
 func WinPackage(dist string) config.MSI {
-	files := []string{}
+	files := []string{"axoflow.ico"}
 	if _, ok := DefaultConfigDists[dist]; ok {
 		files = append(files, "config.yaml")
 	}

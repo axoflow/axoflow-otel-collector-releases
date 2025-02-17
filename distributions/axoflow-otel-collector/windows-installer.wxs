@@ -1,10 +1,10 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
    <Product
-      Name="Axoflow OpenTelemetry Collector ({{ .Version }}) - {{ .Binary }} distribution"
-      Id="B250A214-D463-4E9B-8902-1DE5C19EA951"
-      UpgradeCode="B7C263DD-95A5-436A-A025-DCA5200C2BE3"
+      Name="Axoflow OpenTelemetry Collector"
+      Id="CC9915C6-DF03-4F84-ACCB-6EB9492C9F3F"
+      UpgradeCode="BBD75D8E-8F77-440A-B780-4F30C3E099B6"
       Version="{{ .Version }}"
-      Manufacturer="OpenTelemetry"
+      Manufacturer="Axoflow Inc."
       Language="1033">
       
       <Package
@@ -13,9 +13,10 @@
          Comments="Windows Installer Package"
          InstallScope="perMachine"/>
       <Media Id="1" Cabinet="product.cab" EmbedCab="yes"/>
+      <Icon Id="ProductIcon" SourceFile="axoflow.ico"/>
       <Property Id="ARPPRODUCTICON" Value="ProductIcon"/>
-      <Property Id="ARPHELPLINK" Value="https://opentelemetry.io/"/>
-      <Property Id="ARPURLINFOABOUT" Value="https://opentelemetry.io/"/>
+      <Property Id="ARPHELPLINK" Value="https://axoflow.com/"/>
+      <Property Id="ARPURLINFOABOUT" Value="https://axoflow.com/"/>
       <Property Id="ARPNOREPAIR" Value="1"/>
       <Property Id="ARPNOMODIFY" Value="1"/>
 
@@ -38,48 +39,50 @@
 
       <Directory Id="TARGETDIR" Name="SourceDir">
          <Directory Id="ProgramFiles64Folder">
-            <Directory Id="INSTALLDIR" Name="Axoflow OpenTelemetry Collector">
-               <Component Id="ApplicationComponent" Guid="1207C3C4-1830-4DC8-8A7B-2BD7DBE45BC3">
-                  <!-- Files to include -->
-                  <File
-                     Id="{{ .Binary }}.exe"
-                     Name="{{ .Binary }}.exe"
-                     Source="{{ .Binary }}.exe"
-                     KeyPath="yes"/>
-                  <File
-                     Id="config.yaml"
-                     Name="config.yaml"
-                     Source="config.yaml"/>
+            <Directory Id="COMPANYDIR" Name="Axoflow">
+               <Directory Id="INSTALLDIR" Name="OpenTelemetry Collector">
+                  <Component Id="ApplicationComponent" Guid="A4EC99AE-4DBA-4C66-81C5-6434236CC031">
+                     <!-- Files to include -->
+                     <File
+                        Id="{{ .Binary }}.exe"
+                        Name="{{ .Binary }}.exe"
+                        Source="{{ .Binary }}.exe"
+                        KeyPath="yes"/>
+                     <File
+                        Id="config.yaml"
+                        Name="config.yaml"
+                        Source="config.yaml"/>
 
-                  <ServiceInstall
-                     Id="Sevice"
-                     Name="{{ .Binary }}"
-                     DisplayName="Axoflow OpenTelemetry Collector"
-                     Description="Collects, processes, and exports telemetry from various configurable sources."
-                     Type="ownProcess"
-                     Vital="yes"
-                     Start="auto"
-                     Account="LocalSystem"
-                     ErrorControl="normal"
-                     Arguments="[COLLECTOR_SVC_ARGS]"
-                     Interactive="no"/>
-                  <ServiceControl
-                     Id="StartStopRemoveService"
-                     Name="{{ .Binary }}"
-                     Start="install"
-                     Stop="both"
-                     Remove="uninstall"
-                     Wait="yes"/>
+                     <ServiceInstall
+                        Id="Sevice"
+                        Name="{{ .Binary }}"
+                        DisplayName="Axoflow OpenTelemetry Collector"
+                        Description="Collects, processes, and exports telemetry from various configurable sources."
+                        Type="ownProcess"
+                        Vital="yes"
+                        Start="auto"
+                        Account="LocalSystem"
+                        ErrorControl="normal"
+                        Arguments="[COLLECTOR_SVC_ARGS]"
+                        Interactive="no"/>
+                     <ServiceControl
+                        Id="StartStopRemoveService"
+                        Name="{{ .Binary }}"
+                        Start="install"
+                        Stop="both"
+                        Remove="uninstall"
+                        Wait="yes"/>
 
-                  <RegistryKey
-                     Root="HKLM"
-                     Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\{{ .Binary }}">
-                     <RegistryValue 
-                        Type="expandable"
-                        Name="EventMessageFile"
-                        Value="%SystemRoot%\System32\EventCreate.exe"/>
-                  </RegistryKey>
-               </Component>
+                     <RegistryKey
+                        Root="HKLM"
+                        Key="SYSTEM\CurrentControlSet\Services\EventLog\Application\{{ .Binary }}">
+                        <RegistryValue 
+                           Type="expandable"
+                           Name="EventMessageFile"
+                           Value="%SystemRoot%\System32\EventCreate.exe"/>
+                     </RegistryKey>
+                  </Component>
+               </Directory>
             </Directory>
          </Directory>
       </Directory>

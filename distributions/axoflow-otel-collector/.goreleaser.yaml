@@ -9,6 +9,7 @@ msi:
     name: axoflow-otel-collector_{{ .Version }}_{{ .Os }}_{{ .MsiArch }}
     wxs: windows-installer.wxs
     extra_files:
+      - axoflow.ico
       - config.yaml
 builds:
   - id: axoflow-otel-collector
