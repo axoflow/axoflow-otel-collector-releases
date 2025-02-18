@@ -33,7 +33,7 @@ func main() {
 		log.Fatal("no distribution to build")
 	}
 
-	project := internal.Generate(*distFlag)
+	project := internal.BuildDist(*distFlag)
 	e := yaml.NewEncoder(os.Stdout)
 	e.SetIndent(2)
 	if err := e.Encode(&project); err != nil {

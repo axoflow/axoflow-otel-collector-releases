@@ -2,6 +2,9 @@ version: 2
 project_name: axoflow-otel-collector-releases
 env:
   - COSIGN_YES=true
+  - LD_FLAGS=-s -w
+  - CGO_ENABLED=0
+  - BUILD_FLAGS=-trimpath
 release:
   replace_existing_artifacts: true
 msi:
@@ -12,9 +15,20 @@ msi:
       - axoflow.ico
       - config.yaml
 builds:
-  - id: axoflow-otel-collector
+  - id: axoflow-otel-collector-linux
     goos:
       - linux
+    goarch:
+      - amd64
+      - arm64
+    dir: _build
+    binary: axoflow-otel-collector
+    ldflags:
+      - '{{ .Env.LD_FLAGS }}'
+    flags:
+      - '{{ .Env.BUILD_FLAGS }}'
+  - id: axoflow-otel-collector-windows
+    goos:
       - windows
     goarch:
       - amd64
@@ -22,16 +36,14 @@ builds:
     dir: _build
     binary: axoflow-otel-collector
     ldflags:
-      - -s
-      - -w
+      - '{{ .Env.LD_FLAGS }}'
     flags:
-      - -trimpath
-    env:
-      - CGO_ENABLED=0
+      - '{{ .Env.BUILD_FLAGS }}'
 archives:
   - id: axoflow-otel-collector
     builds:
-      - axoflow-otel-collector
+      - axoflow-otel-collector-linux
+      - axoflow-otel-collector-windows
     name_template: '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}'
 nfpms:
   - package_name: axoflow-otel-collector
@@ -54,11 +66,11 @@ nfpms:
           - /bin/sh
     id: axoflow-otel-collector
     builds:
-      - axoflow-otel-collector
+      - axoflow-otel-collector-linux
     formats:
       - deb
       - rpm
-    maintainer: The OpenTelemetry Collector maintainers <cncf-opentelemetry-maintainers@lists.cncf.io>
+    maintainer: The Axoflow Otel-Collector maintainers <support@axoflow.com>
     description: OpenTelemetry Collector - axoflow-otel-collector
     license: Apache 2.0
 checksum:
