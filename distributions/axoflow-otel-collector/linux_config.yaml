@@ -1,0 +1,18 @@
+receivers:
+  filelog/system:
+    include: ['/var/log/*.log']
+
+exporters:
+  otlp/axorouter:
+    endpoint: 10.0.2.2:4317
+    tls:
+      insecure: true
+
+  debug:
+    verbosity: detailed
+
+service:
+  pipelines:
+    logs/system:
+      receivers: [filelog/system]
+      exporters: [debug, otlp/axorouter]
