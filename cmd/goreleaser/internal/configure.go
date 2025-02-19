@@ -92,6 +92,11 @@ func (b *distributionBuilder) newArchives(dist string, builds []string) []config
 			ID:           dist,
 			NameTemplate: "{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}",
 			Builds:       builds,
+			Files: []config.File{
+				{
+					Source: "README_{{.Os}}.md",
+				},
+			},
 		},
 	}
 }
@@ -149,7 +154,7 @@ func (b *distributionBuilder) WithDefaultMSIConfig() *distributionBuilder {
 }
 
 func (b *distributionBuilder) newMSIConfig(dist string) []config.MSI {
-	files := []string{"axoflow.ico"}
+	files := []string{"axoflow.ico", "README_windows.md"}
 	return []config.MSI{
 		{
 			ID:    dist,
@@ -252,13 +257,13 @@ func (b *distributionBuilder) WithConfigFunc(configFunc func(*distribution)) *di
 func (b *distributionBuilder) WithDefaultConfigIncluded() *distributionBuilder {
 	b.configFuncs = append(b.configFuncs, func(d *distribution) {
 		for i, container := range d.containerImages {
-			container.Files = append(container.Files, "config.yaml")
+			container.Files = append(container.Files, "linux_config.yaml")
 			d.containerImages[i] = container
 		}
 
 		for i, nfpm := range d.nfpms {
 			nfpm.Contents = append(nfpm.Contents, config.NFPMContent{
-				Source:      "config.yaml",
+				Source:      "linux_config.yaml",
 				Destination: path.Join("/etc", d.name, "config.yaml"),
 				Type:        "config|noreplace",
 			})
@@ -266,7 +271,7 @@ func (b *distributionBuilder) WithDefaultConfigIncluded() *distributionBuilder {
 		}
 
 		for i := range d.msiConfig {
-			d.msiConfig[i].Files = append(d.msiConfig[i].Files, "agent_config.yaml")
+			d.msiConfig[i].Files = append(d.msiConfig[i].Files, "windows_config.yaml")
 		}
 	})
 	return b
