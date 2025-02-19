@@ -29,7 +29,7 @@ jobs:
       - name: Set required environment variables for MSI tests
         run: |
           $ErrorActionPreference = 'Stop'
-          $alt_config_path = Resolve-Path .\distributions\${{ inputs.distribution }}\config.yaml
+          $alt_config_path = Resolve-Path .\distributions\${{ inputs.distribution }}\windows_config.yaml
           Test-Path $alt_config_path
           $msi_path = Resolve-Path .\msi\*\*.msi
           Test-Path $msi_path
