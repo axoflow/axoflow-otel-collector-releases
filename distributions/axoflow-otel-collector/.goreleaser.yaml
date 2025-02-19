@@ -13,7 +13,8 @@ msi:
     wxs: windows-installer.wxs
     extra_files:
       - axoflow.ico
-      - config.yaml
+      - README_windows.md
+      - windows_config.yaml
 builds:
   - id: axoflow-otel-collector-linux
     goos:
@@ -45,6 +46,8 @@ archives:
       - axoflow-otel-collector-linux
       - axoflow-otel-collector-windows
     name_template: '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}'
+    files:
+      - src: README_{{.Os}}.md
 nfpms:
   - package_name: axoflow-otel-collector
     contents:
@@ -53,7 +56,7 @@ nfpms:
       - src: axoflow-otel-collector.conf
         dst: /etc/axoflow-otel-collector/axoflow-otel-collector.conf
         type: config|noreplace
-      - src: config.yaml
+      - src: linux_config.yaml
         dst: /etc/axoflow-otel-collector/config.yaml
         type: config|noreplace
     scripts:
@@ -83,7 +86,7 @@ dockers:
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-amd64
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-amd64
     extra_files:
-      - config.yaml
+      - linux_config.yaml
     build_flag_templates:
       - --pull
       - --platform=linux/amd64
@@ -101,7 +104,7 @@ dockers:
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-arm64
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-arm64
     extra_files:
-      - config.yaml
+      - linux_config.yaml
     build_flag_templates:
       - --pull
       - --platform=linux/arm64

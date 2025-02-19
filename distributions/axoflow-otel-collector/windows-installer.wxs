@@ -51,7 +51,11 @@
                      <File
                         Id="config.yaml"
                         Name="config.yaml"
-                        Source="config.yaml"/>
+                        Source="windows_config.yaml"/>
+                     <File
+                        Id="README.md"
+                        Name="README.md"
+                        Source="README_windows.md"/>
 
                      <ServiceInstall
                         Id="Sevice"
