@@ -1,0 +1,86 @@
+receivers:
+  windowseventlog/application:
+    channel: application
+    raw: true
+  windowseventlog/system:
+    channel: system
+    raw: true
+  windowseventlog/security:
+    channel: security
+    raw: true
+
+  filelog/windows_dns_debug_log:
+    include: ['']
+    resource:
+      com.axoflow.vendor: microsoft
+      com.axoflow.product: windows-dns
+    start_at: beginning
+    multiline:
+      line_start_pattern: '\d\d?/\d\d?/\d{4}'
+
+  filelog/windows_dhcp_server_v4_auditlog:
+    include: ['']
+    start_at: beginning
+    resource:
+      com.axoflow.vendor: microsoft
+      com.axoflow.product: windows-dhcp
+    attributes:
+      dhcp.ip_version: ipv4
+    operators:
+      -  type: filter
+         expr: '!(body matches "^[0-9]+,.*$")'
+
+  filelog/windows_dhcp_server_v6_auditlog:
+    include: ['']
+    start_at: beginning
+    resource:
+      com.axoflow.vendor: microsoft
+      com.axoflow.product: windows-dhcp
+    attributes:
+      dhcp.ip_version: ipv6
+    operators:
+      -  type: filter
+         expr: '!(body matches "^[0-9]+,.*$")'
+
+processors:
+  resourcedetection/system:
+    detectors: ["system", "env"]
+    system:
+      hostname_sources: ["dns", "os"]
+      resource_attributes:
+        host.ip:
+          enabled: true
+        host.id:
+          enabled: true
+        host.mac:
+          enabled: true
+
+  resource/agent:
+    attributes:
+    - key: agent
+      value: axoflow-otelcol-agent
+      action: upsert
+
+exporters:
+  otlp/axorouter:
+    endpoint: 10.0.2.2:4317
+    tls:
+      insecure: true
+
+  debug:
+    verbosity: detailed
+
+service:
+  pipelines:
+    logs/eventlog:
+      receivers: [windowseventlog/application, windowseventlog/system, windowseventlog/security]
+      processors: [resource/agent, resourcedetection/system]
+      exporters: [otlp/axorouter]
+    logs/dns:
+      receivers: [filelog/windows_dns_debug_log]
+      processors: [resource/agent, resourcedetection/system]
+      exporters: [otlp/axorouter]
+    logs/dhcp:
+      receivers: [filelog/windows_dhcp_server_v4_auditlog, filelog/windows_dhcp_server_v6_auditlog]
+      processors: [resource/agent, resourcedetection/system]
+      exporters: [otlp/axorouter]
