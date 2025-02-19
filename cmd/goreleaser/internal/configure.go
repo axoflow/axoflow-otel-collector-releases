@@ -266,7 +266,7 @@ func (b *distributionBuilder) WithDefaultConfigIncluded() *distributionBuilder {
 		}
 
 		for i := range d.msiConfig {
-			d.msiConfig[i].Files = append(d.msiConfig[i].Files, "config.yaml")
+			d.msiConfig[i].Files = append(d.msiConfig[i].Files, "agent_config.yaml")
 		}
 	})
 	return b
