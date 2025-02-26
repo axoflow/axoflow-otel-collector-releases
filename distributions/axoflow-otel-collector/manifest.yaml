@@ -19,7 +19,7 @@ exporters:
   - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.120.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.120.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusexporter v0.120.0
-  - gomod: github.com/axoflow/fluentforwardexporter v0.120.0
+  - gomod: github.com/axoflow/fluentforwardexporter v0.120.0-dev1
 
 processors:
   - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.120.0
@@ -53,8 +53,6 @@ providers:
 replaces:
   # see https://github.com/openshift/api/pull/1515
   - github.com/openshift/api => github.com/openshift/api v0.0.0-20230726162818-81f778f3b3ec
-  # see https://github.com/IBM/fluent-forward-go/pull/63
-  # remove once there is a new release of fluent-forward-go
-  - github.com/IBM/fluent-forward-go => github.com/IBM/fluent-forward-go v0.2.3-0.20240418091724-720f8df4306a
+  # Axoflow specific replacements for patched/additional components
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/countconnector v0.120.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.120.0
