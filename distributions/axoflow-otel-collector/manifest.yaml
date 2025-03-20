@@ -35,6 +35,7 @@ processors:
 receivers:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.120.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/azureeventhubreceiver v0.120.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awscloudwatchreceiver v0.120.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowseventlogreceiver v0.120.0
 
 connectors:
