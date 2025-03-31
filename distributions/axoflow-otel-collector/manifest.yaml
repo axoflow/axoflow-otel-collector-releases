@@ -59,5 +59,5 @@ replaces:
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/countconnector v0.120.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.120.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awscloudwatchreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/awscloudwatchreceiver v0.120.0-axoflow.1
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowseventlogreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/windowseventlogreceiver v0.120.0-axoflow.1
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowseventlogreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/windowseventlogreceiver v0.120.0-axoflow.2
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.120.0
