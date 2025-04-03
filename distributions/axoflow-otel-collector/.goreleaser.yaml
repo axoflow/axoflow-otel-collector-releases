@@ -28,11 +28,24 @@ builds:
       - '{{ .Env.LD_FLAGS }}'
     flags:
       - '{{ .Env.BUILD_FLAGS }}'
-  - id: axoflow-otel-collector-windows
+  - id: axoflow-otel-collector-windows-amd64
     goos:
       - windows
     goarch:
       - amd64
+    dir: _build
+    binary: axoflow-otel-collector
+    ldflags:
+      - '{{ .Env.LD_FLAGS }}'
+    flags:
+      - '{{ .Env.BUILD_FLAGS }}'
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-w64-mingw32-gcc
+  - id: axoflow-otel-collector-windows-arm64
+    goos:
+      - windows
+    goarch:
       - arm64
     dir: _build
     binary: axoflow-otel-collector
@@ -40,11 +53,15 @@ builds:
       - '{{ .Env.LD_FLAGS }}'
     flags:
       - '{{ .Env.BUILD_FLAGS }}'
+    env:
+      - CGO_ENABLED=1
+      - CC=aarch64-w64-mingw32-gcc
 archives:
   - id: axoflow-otel-collector
     builds:
       - axoflow-otel-collector-linux
-      - axoflow-otel-collector-windows
+      - axoflow-otel-collector-windows-amd64
+      - axoflow-otel-collector-windows-arm64
     name_template: '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}'
     files:
       - src: README_{{.Os}}.md
