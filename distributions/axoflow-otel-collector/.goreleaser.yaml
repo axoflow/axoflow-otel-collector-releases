@@ -40,6 +40,9 @@ builds:
       - '{{ .Env.LD_FLAGS }}'
     flags:
       - '{{ .Env.BUILD_FLAGS }}'
+    env:
+      - CC=x86_64-w64-mingw32-gcc
+      - CGO_ENABLED=1
 archives:
   - id: axoflow-otel-collector
     builds:

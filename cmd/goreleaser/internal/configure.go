@@ -385,6 +385,10 @@ func (c *fullBuildConfig) Build(dist string) config.Build {
 		Goarm:   c.armVersion,
 		Goppc64: c.ppc64Version,
 	}
+
+	if goos := c.targetOS; goos == "windows" {
+		buildConfig.Env = append(buildConfig.Env, "CC=x86_64-w64-mingw32-gcc", "CGO_ENABLED=1")
+	}
 	return buildConfig
 }
 
