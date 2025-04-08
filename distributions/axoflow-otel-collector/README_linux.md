@@ -23,6 +23,8 @@ exporters:
       insecure: true
 ```
 
+**NOTE: Don't forget to add the same endpoint in the telemetry section too!**
+
 You can use the [Telemetry controller](https://axoflow.com/reinvent-kubernetes-logging-with-telemetry-controller/) to simplify the creation of collector configuration in Kubernetes environments.
 
 You can read more about the OpenTelemetry Collector configuration in it's official [documentation](https://opentelemetry.io/docs/collector/configuration/).

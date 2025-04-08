@@ -71,6 +71,19 @@ exporters:
     verbosity: detailed
 
 service:
+  telemetry:
+    logs:
+      level: debug
+      encoding: json
+      initial_fields:
+        service.name: axoflow-otel-collector
+      processors:
+        - simple:
+            exporter:
+              otlp:
+                protocol: http/protobuf
+                endpoint: 10.0.2.2:4317
+                insecure: true
   pipelines:
     logs/eventlog:
       receivers: [windowseventlog/application, windowseventlog/system, windowseventlog/security]
