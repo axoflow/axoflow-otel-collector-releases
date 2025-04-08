@@ -16,3 +16,16 @@ service:
     logs/system:
       receivers: [filelog/system]
       exporters: [debug, otlp/axorouter]
+  telemetry:
+    logs:
+      level: debug
+      encoding: json
+      initial_fields:
+        service.name: axoflow-otel-collector
+      processors:
+        - simple:
+            exporter:
+              otlp:
+                protocol: grpc
+                endpoint: 10.0.2.2:4317
+                insecure: true
