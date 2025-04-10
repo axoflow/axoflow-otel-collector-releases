@@ -1,5 +1,5 @@
 FROM alpine:3.21 as certs
-RUN apk --update add ca-certificates
+RUN apk --no-cache --update add ca-certificates
 
 FROM scratch
 
