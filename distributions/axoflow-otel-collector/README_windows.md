@@ -23,6 +23,8 @@ exporters:
       insecure: true
 ```
 
+**NOTE: Don't forget to add the same endpoint in the telemetry section too!**
+
 The default configuration supports the following formats.
 
 ### Event log
