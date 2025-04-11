@@ -23,19 +23,50 @@
       <MajorUpgrade
          DowngradeErrorMessage="A later version of Axoflow OpenTelemetry Collector already installed. Setup will now exit."/>
 
-      <Feature Id="Feature" Level="1">
-         <ComponentRef Id="ApplicationComponent"/>
-      </Feature>
+      <Property Id="CONFIG_PATH" Value="[CommonAppDataFolder]Axoflow\OpenTelemetry Collector\config.yaml" />
+
+      <Property Id="CONFIG_FILE_EXISTS">
+         <DirectorySearch Id="AppDataFolderSearch" Path="[CommonAppDataFolder]">
+            <DirectorySearch Id="AxoflowSearch" Path="Axoflow">
+               <DirectorySearch Id="OpenTelemetryCollectorSearch" Path="OpenTelemetry Collector">
+                  <FileSearch Id="ConfigSearch" Name="config.yaml" />
+               </DirectorySearch>
+            </DirectorySearch>
+         </DirectorySearch>
+      </Property>
 
       <Property Id="COLLECTOR_SVC_ARGS"/>
       <CustomAction
          Id="SetCollectorSvcArgs"
          Property="COLLECTOR_SVC_ARGS"
-         Value="--config &quot;[INSTALLDIR]config.yaml&quot;"/>
+         Value="--config &quot;[CONFIG_PATH]&quot;"/>
+
+      <CustomAction 
+         Id="CreateConfigDir" 
+         ExeCommand="cmd /c if not exist &quot;[CommonAppDataFolder]Axoflow\OpenTelemetry Collector&quot; mkdir &quot;[CommonAppDataFolder]Axoflow\OpenTelemetry Collector&quot;" 
+         Directory="INSTALLDIR" 
+         Impersonate="no" 
+         Execute="deferred" 
+         Return="check" />
+
+      <CustomAction 
+         Id="CopyConfig" 
+         ExeCommand="cmd /c if not exist &quot;[CONFIG_PATH]&quot; copy /y &quot;[INSTALLDIR]config.yaml&quot; &quot;[CONFIG_PATH]&quot;" 
+         Directory="INSTALLDIR" 
+         Impersonate="no" 
+         Execute="deferred" 
+         Return="check" />
 
       <InstallExecuteSequence>
          <Custom Action="SetCollectorSvcArgs" Before="InstallFiles">NOT COLLECTOR_SVC_ARGS</Custom>
+         <Custom Action="CreateConfigDir" After="InstallFiles">NOT Installed</Custom>
+         <Custom Action="CopyConfig" After="CreateConfigDir">NOT CONFIG_FILE_EXISTS AND NOT Installed</Custom>
       </InstallExecuteSequence>
+
+      <Feature Id="Feature" Level="1">
+         <ComponentRef Id="ApplicationComponent"/>
+         <ComponentRef Id="ConfigDirectoryComponent"/>
+      </Feature>
 
       <Directory Id="TARGETDIR" Name="SourceDir">
          <Directory Id="ProgramFiles64Folder">
@@ -51,7 +82,8 @@
                      <File
                         Id="config.yaml"
                         Name="config.yaml"
-                        Source="windows_config.yaml"/>
+                        Source="windows_config.yaml"
+                        NeverOverwrite="yes"/>
                      <File
                         Id="README.md"
                         Name="README.md"
@@ -85,6 +117,18 @@
                            Name="EventMessageFile"
                            Value="%SystemRoot%\System32\EventCreate.exe"/>
                      </RegistryKey>
+                  </Component>
+               </Directory>
+            </Directory>
+         </Directory>
+         
+         <Directory Id="CommonAppDataFolder">
+            <Directory Id="AxoflowDataDir" Name="Axoflow">
+               <Directory Id="CollectorDataDir" Name="OpenTelemetry Collector">
+                  <Component Id="ConfigDirectoryComponent" Guid="B5EC99AE-4DBA-4C66-81C5-6434236CC032">
+                     <CreateFolder>
+                        <Permission User="Everyone" GenericAll="yes"/>
+                     </CreateFolder>
                   </Component>
                </Directory>
             </Directory>
