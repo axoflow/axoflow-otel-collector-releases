@@ -90,5 +90,31 @@
             </Directory>
          </Directory>
       </Directory>
+
+      <Property Id="CONFIG_FILE_EXISTS" Value="0"/>
+      <CustomAction 
+         Id="CheckConfigFileExists" 
+         ExeCommand="cmd /c if exist &quot;[INSTALLDIR]config.yaml&quot; (exit 0) else (exit 1)" 
+         Directory="INSTALLDIR"
+         Return="check" />
+      <CustomAction
+         Id="SetConfigFileExists"
+         Property="CONFIG_FILE_EXISTS"
+         Value="1"
+         Execute="immediate" />
+      <CustomAction
+         Id="CopyDefaultConfig"
+         ExeCommand="xcopy /y &quot;[INSTALLDIR]config.yaml&quot; &quot;[INSTALLDIR]&quot;"
+         Directory="INSTALLDIR"
+         Impersonate="no"
+         Execute="deferred"
+         Return="check" />
+
+      <InstallExecuteSequence>
+         <Custom Action="CheckConfigFileExists" After="CostFinalize">NOT Installed</Custom>
+         <Custom Action="SetConfigFileExists" After="CheckConfigFileExists">NOT Installed AND %CheckConfigFileExists = 0</Custom>
+         <Custom Action="CopyDefaultConfig" After="InstallFiles">CONFIG_FILE_EXISTS = 0 AND NOT Installed</Custom>
+      </InstallExecuteSequence>
+
    </Product>
 </Wix>
