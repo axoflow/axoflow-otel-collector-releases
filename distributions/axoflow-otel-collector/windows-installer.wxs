@@ -1,7 +1,7 @@
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
    <Product
       Name="Axoflow OpenTelemetry Collector"
-      Id="CC9915C6-DF03-4F84-ACCB-6EB9492C9F3F"
+      Id="*"
       UpgradeCode="BBD75D8E-8F77-440A-B780-4F30C3E099B6"
       Version="{{ .Version }}"
       Manufacturer="Axoflow Inc."
