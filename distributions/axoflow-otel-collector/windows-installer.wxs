@@ -25,6 +25,7 @@
 
       <Feature Id="Feature" Level="1">
          <ComponentRef Id="ApplicationComponent"/>
+         <ComponentRef Id="ConfigComponent"/> 
       </Feature>
 
       <Property Id="COLLECTOR_SVC_ARGS"/>
@@ -49,16 +50,12 @@
                         Source="{{ .Binary }}.exe"
                         KeyPath="yes"/>
                      <File
-                        Id="config.yaml"
-                        Name="config.yaml"
-                        Source="windows_config.yaml"/>
-                     <File
                         Id="README.md"
                         Name="README.md"
                         Source="README_windows.md"/>
 
                      <ServiceInstall
-                        Id="Sevice"
+                        Id="Service"
                         Name="{{ .Binary }}"
                         DisplayName="Axoflow OpenTelemetry Collector"
                         Description="Collects, processes, and exports telemetry from various configurable sources."
@@ -86,35 +83,16 @@
                            Value="%SystemRoot%\System32\EventCreate.exe"/>
                      </RegistryKey>
                   </Component>
+                  <Component Id="ConfigComponent" Guid="*" NeverOverwrite="yes">
+                     <File
+                        Id="config.yaml"
+                        Name="config.yaml"
+                        Source="windows_config.yaml"
+                        KeyPath="yes"/>
+                  </Component>
                </Directory>
             </Directory>
          </Directory>
       </Directory>
-
-      <Property Id="CONFIG_FILE_EXISTS" Value="0"/>
-      <CustomAction 
-         Id="CheckConfigFileExists" 
-         ExeCommand="cmd /c if exist &quot;[INSTALLDIR]config.yaml&quot; (exit 0) else (exit 1)" 
-         Directory="INSTALLDIR"
-         Return="check" />
-      <CustomAction
-         Id="SetConfigFileExists"
-         Property="CONFIG_FILE_EXISTS"
-         Value="1"
-         Execute="immediate" />
-      <CustomAction
-         Id="CopyDefaultConfig"
-         ExeCommand="xcopy /y &quot;[INSTALLDIR]config.yaml&quot; &quot;[INSTALLDIR]&quot;"
-         Directory="INSTALLDIR"
-         Impersonate="no"
-         Execute="deferred"
-         Return="check" />
-
-      <InstallExecuteSequence>
-         <Custom Action="CheckConfigFileExists" After="CostFinalize">NOT Installed</Custom>
-         <Custom Action="SetConfigFileExists" After="CheckConfigFileExists">NOT Installed AND %CheckConfigFileExists = 0</Custom>
-         <Custom Action="CopyDefaultConfig" After="InstallFiles">CONFIG_FILE_EXISTS = 0 AND NOT Installed</Custom>
-      </InstallExecuteSequence>
-
    </Product>
 </Wix>
