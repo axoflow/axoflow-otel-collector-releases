@@ -156,7 +156,7 @@ func expectedServiceCommand(t *testing.T, serviceName, collectorServiceArgs stri
 	collectorExe := filepath.Join(collectorDir, serviceName) + ".exe"
 
 	if collectorServiceArgs == "" {
-		collectorServiceArgs = "--config " + quotedIfRequired(filepath.Join(collectorDir, "config.yaml"))
+		collectorServiceArgs = "--config " + quotedIfRequired(getConfigFilePath(t))
 	} else {
 		// Remove any quotation added for the msiexec command line
 		collectorServiceArgs = strings.Trim(collectorServiceArgs, "\"")
@@ -164,6 +164,15 @@ func expectedServiceCommand(t *testing.T, serviceName, collectorServiceArgs stri
 	}
 
 	return quotedIfRequired(collectorExe) + " " + collectorServiceArgs
+}
+
+func getConfigFilePath(t *testing.T) string {
+	programDataDir := os.Getenv("PROGRAMDATA")
+	require.NotEmpty(t, programDataDir, "PROGRAMDATA environment variable is not set")
+
+	configFilePath := filepath.Join(programDataDir, "Axoflow", "OpenTelemetry Collector", "config.yaml")
+
+	return configFilePath
 }
 
 func getServiceName(t *testing.T) string {
