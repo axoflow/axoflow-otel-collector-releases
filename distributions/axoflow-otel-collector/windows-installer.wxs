@@ -59,6 +59,10 @@
                         Id="README.md"
                         Name="README.md"
                         Source="README_windows.md"/>
+                     <File
+                        Id="default_config.yaml"
+                        Name="default_config.yaml"
+                        Source="windows_config.yaml"/>
 
                      <ServiceInstall
                         Id="Service"
