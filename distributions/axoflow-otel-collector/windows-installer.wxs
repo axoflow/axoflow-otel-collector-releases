@@ -26,8 +26,10 @@
       <Feature Id="Feature" Level="1">
          <ComponentRef Id="ApplicationComponent"/>
          <ComponentRef Id="ConfigComponent"/> 
+         <ComponentRef Id="StartServiceComponent"/>
       </Feature>
 
+      <Property Id="DISABLE_AUTOSTART" Value="0"/>
       <Property Id="COLLECTOR_SVC_ARGS"/>
       <CustomAction
          Id="SetCollectorSvcArgs"
@@ -36,6 +38,8 @@
 
       <InstallExecuteSequence>
          <Custom Action="SetCollectorSvcArgs" Before="InstallFiles">NOT COLLECTOR_SVC_ARGS</Custom>
+      <InstallServices />
+      <StartServices Condition="DISABLE_AUTOSTART&lt;&gt;1" />
       </InstallExecuteSequence>
 
       <Directory Id="TARGETDIR" Name="SourceDir">
@@ -67,9 +71,8 @@
                         Arguments="[COLLECTOR_SVC_ARGS]"
                         Interactive="no"/>
                      <ServiceControl
-                        Id="StartStopRemoveService"
+                        Id="StopRemoveService"
                         Name="{{ .Binary }}"
-                        Start="install"
                         Stop="both"
                         Remove="uninstall"
                         Wait="yes"/>
@@ -82,6 +85,20 @@
                            Name="EventMessageFile"
                            Value="%SystemRoot%\System32\EventCreate.exe"/>
                      </RegistryKey>
+                  </Component>
+                  <Component Id="StartServiceComponent" Guid="*">
+                     <ServiceControl
+                        Id="StartService"
+                        Name="{{ .Binary }}"
+                        Start="install"
+                        Wait="yes"/>
+                  <!-- NOTE:
+                      Windows Installer uses the KeyPath to detect whether a given Component is registered.
+                      ServiceControl type nodes do not have a KeyPath attribute, so we need to supply the RegistryKey manually.
+                  -->
+                     <RegistryKey Root="HKCU" Key="Software\Axoflow">
+                        <RegistryValue Id="StartServiceComponent" Type="string" Name="present" Value="1" KeyPath="yes"/>
+                    </RegistryKey>
                   </Component>
                   <Component Id="ConfigComponent" Guid="*" NeverOverwrite="yes">
                      <File
