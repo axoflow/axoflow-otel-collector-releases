@@ -108,7 +108,7 @@
            <Directory Id="CommonAppDataFolder">
                 <Directory Id="AxoflowConfigDir" Name="Axoflow">
                   <Directory Id="AxoflowConfigDirOtelCol" Name="OpenTelemetry Collector">
-                  <Component Id="ConfigComponent" Guid="A4EC99AE-4DBA-4C66-81C5-6434236CC032" Permanent="yes" NeverOverwrite="yes">
+                  <Component Id="ConfigComponent" Permanent="yes" NeverOverwrite="yes">
                     <File
                       Id="ConfigFile"
                       Name="config.yaml"
