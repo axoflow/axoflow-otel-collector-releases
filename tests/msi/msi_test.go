@@ -91,6 +91,10 @@ func runMsiTest(t *testing.T, test msiTest, msiInstallerPath string) {
 		err := uninstallCmd.Run()
 		t.Logf("Uninstall command: %s", uninstallCmd.SysProcAttr.CmdLine)
 		require.NoError(t, err, "Failed to uninstall the MSI: %v", err)
+
+		// Make sure the config file is kept
+		_, err = os.Stat(getConfigFilePath(t))
+		require.NoError(t, err, "Failed to find config file after uninstall: %v", err)
 	}()
 
 	// Verify the service
