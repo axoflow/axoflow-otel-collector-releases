@@ -25,8 +25,10 @@
 
       <Feature Id="Feature" Level="1">
          <ComponentRef Id="ApplicationComponent"/>
-         <ComponentRef Id="ConfigComponent"/> 
          <ComponentRef Id="StartServiceComponent"/>
+      </Feature>
+      <Feature Id="configFeature" Level="1" Absent="disallow">
+         <ComponentRef Id="ConfigComponent"/>
       </Feature>
 
       <Property Id="DISABLE_AUTOSTART" Value="0"/>
@@ -34,7 +36,7 @@
       <CustomAction
          Id="SetCollectorSvcArgs"
          Property="COLLECTOR_SVC_ARGS"
-         Value="--config &quot;[INSTALLDIR]config.yaml&quot;"/>
+         Value="--config &quot;[CommonAppDataFolder]Axoflow\OpenTelemetry Collector\config.yaml&quot;"/>
 
       <InstallExecuteSequence>
          <Custom Action="SetCollectorSvcArgs" Before="InstallFiles">NOT COLLECTOR_SVC_ARGS</Custom>
@@ -100,16 +102,22 @@
                         <RegistryValue Id="StartServiceComponent" Type="string" Name="present" Value="1" KeyPath="yes"/>
                     </RegistryKey>
                   </Component>
-                  <Component Id="ConfigComponent" Guid="*" NeverOverwrite="yes">
-                     <File
-                        Id="config.yaml"
-                        Name="config.yaml"
-                        Source="windows_config.yaml"
-                        KeyPath="yes"/>
-                  </Component>
                </Directory>
             </Directory>
          </Directory>
+           <Directory Id="CommonAppDataFolder">
+                <Directory Id="AxoflowConfigDir" Name="Axoflow">
+                  <Directory Id="AxoflowConfigDirOtelCol" Name="OpenTelemetry Collector">
+                  <Component Id="ConfigComponent" Guid="A4EC99AE-4DBA-4C66-81C5-6434236CC032" Permanent="yes" NeverOverwrite="yes">
+                    <File
+                      Id="ConfigFile"
+                      Name="config.yaml"
+                      Source="windows_config.yaml"
+                      KeyPath="yes"/>
+                  </Component>
+            </Directory>
+          </Directory>
+        </Directory>
       </Directory>
    </Product>
 </Wix>
