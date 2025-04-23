@@ -91,6 +91,10 @@ func runMsiTest(t *testing.T, test msiTest, msiInstallerPath string) {
 		err := uninstallCmd.Run()
 		t.Logf("Uninstall command: %s", uninstallCmd.SysProcAttr.CmdLine)
 		require.NoError(t, err, "Failed to uninstall the MSI: %v", err)
+
+		// Make sure the config file is kept
+		_, err = os.Stat(getConfigFilePath(t))
+		require.NoError(t, err, "Failed to find config file after uninstall: %v", err)
 	}()
 
 	// Verify the service
@@ -156,7 +160,7 @@ func expectedServiceCommand(t *testing.T, serviceName, collectorServiceArgs stri
 	collectorExe := filepath.Join(collectorDir, serviceName) + ".exe"
 
 	if collectorServiceArgs == "" {
-		collectorServiceArgs = "--config " + quotedIfRequired(filepath.Join(collectorDir, "config.yaml"))
+		collectorServiceArgs = "--config " + quotedIfRequired(getConfigFilePath(t))
 	} else {
 		// Remove any quotation added for the msiexec command line
 		collectorServiceArgs = strings.Trim(collectorServiceArgs, "\"")
@@ -164,6 +168,15 @@ func expectedServiceCommand(t *testing.T, serviceName, collectorServiceArgs stri
 	}
 
 	return quotedIfRequired(collectorExe) + " " + collectorServiceArgs
+}
+
+func getConfigFilePath(t *testing.T) string {
+	programDataDir := os.Getenv("PROGRAMDATA")
+	require.NotEmpty(t, programDataDir, "PROGRAMDATA environment variable is not set")
+
+	configFilePath := filepath.Join(programDataDir, "Axoflow", "OpenTelemetry Collector", "config.yaml")
+
+	return configFilePath
 }
 
 func getServiceName(t *testing.T) string {
