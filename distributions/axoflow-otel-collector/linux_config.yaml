@@ -5,16 +5,28 @@ receivers:
 exporters:
   otlp/axorouter:
     endpoint: 10.0.2.2:4317
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
+    sending_queue:
+      enabled: true
+      storage: file_storage
     tls:
       insecure: true
 
   nop:
 
+extensions:
+  file_storage:
+    directory: /etc/axoflow-otel-collector/storage
+    create_directory: true
+
 service:
+  extensions: [file_storage]
   pipelines:
     logs/system:
       receivers: [filelog/system]
-      #exporters: [otlp/axorouter]
+      # exporters: [otlp/axorouter]
       exporters: [nop]
   telemetry:
     logs:
@@ -22,10 +34,10 @@ service:
       encoding: json
       initial_fields:
         service.name: axoflow-otel-collector
-      processors:
-        - simple:
-            exporter:
-              otlp:
-                protocol: grpc
-                endpoint: 10.0.2.2:4317
-                insecure: true
+      # processors:
+      #   - simple:
+      #       exporter:
+      #         otlp:
+      #           protocol: grpc
+      #           endpoint: 10.0.2.2:4317
+      #           insecure: true
