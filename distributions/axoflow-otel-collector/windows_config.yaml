@@ -64,25 +64,37 @@ processors:
 exporters:
   otlp/axorouter:
     endpoint: 10.0.2.2:4317
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
+    sending_queue:
+      enabled: true
+      storage: file_storage
     tls:
       insecure: true
 
   nop:
 
+extensions:
+  file_storage:
+    directory: C:\ProgramData\Axoflow\OpenTelemetry Collector\storage
+    create_directory: true
+
 service:
+  extensions: [file_storage]
   pipelines:
     logs/eventlog:
       receivers: [windowseventlog/application, windowseventlog/system, windowseventlog/security]
       processors: [resource/agent, resourcedetection/system]
-      #exporters: [otlp/axorouter]
+      # exporters: [otlp/axorouter]
       exporters: [nop]
     logs/dns:
       receivers: [filelog/windows_dns_debug_log]
       processors: [resource/agent, resourcedetection/system]
-      #exporters: [otlp/axorouter]
+      # exporters: [otlp/axorouter]
       exporters: [nop]
     logs/dhcp:
       receivers: [filelog/windows_dhcp_server_v4_auditlog, filelog/windows_dhcp_server_v6_auditlog]
       processors: [resource/agent, resourcedetection/system]
-      #exporters: [otlp/axorouter]
+      # exporters: [otlp/axorouter]
       exporters: [nop]
