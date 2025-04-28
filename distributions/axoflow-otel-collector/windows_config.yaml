@@ -67,9 +67,6 @@ exporters:
     tls:
       insecure: true
 
-  debug:
-    verbosity: detailed
-
   nop:
 
 service:
