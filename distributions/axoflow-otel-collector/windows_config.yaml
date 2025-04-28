@@ -70,17 +70,22 @@ exporters:
   debug:
     verbosity: detailed
 
+  nop:
+
 service:
   pipelines:
     logs/eventlog:
       receivers: [windowseventlog/application, windowseventlog/system, windowseventlog/security]
       processors: [resource/agent, resourcedetection/system]
-      exporters: [otlp/axorouter]
+      #exporters: [otlp/axorouter]
+      exporters: [nop]
     logs/dns:
       receivers: [filelog/windows_dns_debug_log]
       processors: [resource/agent, resourcedetection/system]
-      exporters: [otlp/axorouter]
+      #exporters: [otlp/axorouter]
+      exporters: [nop]
     logs/dhcp:
       receivers: [filelog/windows_dhcp_server_v4_auditlog, filelog/windows_dhcp_server_v6_auditlog]
       processors: [resource/agent, resourcedetection/system]
-      exporters: [otlp/axorouter]
+      #exporters: [otlp/axorouter]
+      exporters: [nop]
