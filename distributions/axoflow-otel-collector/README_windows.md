@@ -22,6 +22,8 @@ exporters:
     tls:
       insecure: true
 ```
+Add `otlp/axorouter` to the `exporters` section of the configuration file.
+
 
 The default configuration supports the following formats.
 

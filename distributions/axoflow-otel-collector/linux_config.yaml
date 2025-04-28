@@ -8,14 +8,14 @@ exporters:
     tls:
       insecure: true
 
-  debug:
-    verbosity: detailed
+  nop:
 
 service:
   pipelines:
     logs/system:
       receivers: [filelog/system]
-      exporters: [debug, otlp/axorouter]
+      #exporters: [otlp/axorouter]
+      exporters: [nop]
   telemetry:
     logs:
       level: debug

@@ -23,6 +23,8 @@ exporters:
       insecure: true
 ```
 
+Add `otlp/axorouter` to the `exporters` section of the configuration file.
+
 **NOTE: Don't forget to add the same endpoint in the telemetry section too!**
 
 You can use the [Telemetry controller](https://axoflow.com/reinvent-kubernetes-logging-with-telemetry-controller/) to simplify the creation of collector configuration in Kubernetes environments.
