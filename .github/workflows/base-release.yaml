@@ -65,6 +65,9 @@ jobs:
           sudo mv llvm-mingw-20250402-ucrt-ubuntu-20.04-x86_64 /opt/llvm-mingw
           sudo ln -s /opt/llvm-mingw/bin/aarch64-w64-mingw32-gcc /usr/local/bin/aarch64-w64-mingw32-gcc
 
+      - name: Run version update script
+        run: ./scripts/pre-update-version.sh "${{ github.ref_name }}"
+
       - name: Generate distribution sources
         run: make generate-sources
 
