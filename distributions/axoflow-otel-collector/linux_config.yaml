@@ -23,6 +23,15 @@ extensions:
 
 service:
   extensions: [file_storage]
+  telemetry:
+    metrics:
+      level: basic
+      readers:
+      - pull:
+          exporter:
+            prometheus:
+              host: localhost
+              port: 8888
   pipelines:
     logs/system:
       receivers: [filelog/system]
