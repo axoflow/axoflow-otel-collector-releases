@@ -2,7 +2,7 @@
 
 ## Installation steps
 
-1. Download the proper artifact for your platform. (We provide RPM and DEB packages aswell as binary releases for amd64 and arm64 architectures.)
+1. Download the proper artifact for your platform. (We provide RPM and DEB packages as well as binary releases for amd64 and arm64 architectures.)
 
 2. Run the installer.
 
