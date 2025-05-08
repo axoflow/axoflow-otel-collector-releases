@@ -46,6 +46,10 @@ You can use the [Telemetry controller](https://axoflow.com/reinvent-kubernetes-l
 
 You can read more about the OpenTelemetry Collector configuration in it's official [documentation](https://opentelemetry.io/docs/collector/configuration/).
 
+### Metrics
+
+By default metrics are enabled on `basic` level and are available on `localhost:8888/metrics`.
+
 ## Support
 
 If you have any questions, get in touch with us on [Discord](https://discord.gg/583Z4wjem2)!
