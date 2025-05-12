@@ -9,7 +9,7 @@
 The installer ships the following components:
 
   * Installs the application (by default) to `C:\Program Files\Axoflow\OpenTelemetry Collector\axoflow-otel-collector.exe`
-  * A default configuration that should be edited before use.
+  * A default configuration that should be edited before use (`C:\ProgramData\Axoflow\OpenTelemetry Collector\config.yaml`).
 
 ## Configuration
 
