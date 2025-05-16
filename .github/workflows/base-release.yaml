@@ -53,20 +53,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y wixl
 
-      - name: Setup mingw-w64 # Required to build Windows AMD64 packages
-        if: ${{ matrix.GOOS == 'windows' && matrix.GOARCH == 'amd64' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-mingw-w64-x86-64-win32
-
-      - name: Setup llvm-mingw # Required to build Windows ARM64 packages
-        if: ${{ matrix.GOOS == 'windows' && matrix.GOARCH == 'arm64' }}
-        run: |
-          wget https://github.com/mstorsjo/llvm-mingw/releases/download/20250402/llvm-mingw-20250402-ucrt-ubuntu-20.04-x86_64.tar.xz
-          tar -xJf llvm-mingw-20250402-ucrt-ubuntu-20.04-x86_64.tar.xz
-          sudo mv llvm-mingw-20250402-ucrt-ubuntu-20.04-x86_64 /opt/llvm-mingw
-          sudo ln -s /opt/llvm-mingw/bin/aarch64-w64-mingw32-gcc /usr/local/bin/aarch64-w64-mingw32-gcc
-
       - name: Run version update script
         run: ./scripts/pre-update-version.sh "${{ github.ref_name }}"
 
