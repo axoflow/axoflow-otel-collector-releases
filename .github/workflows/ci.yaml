@@ -1,11 +1,15 @@
 name: Continuous Integration
 
 on:
-  merge_group: 
+  merge_group:
   push:
     branches: [main]
   pull_request:
     branches: [main]
+
+env:
+  GONOSUMDB: github.com/axoflow/*
+  GOPRIVATE: github.com/axoflow/*
 
 jobs:
   build:
@@ -26,5 +30,18 @@ jobs:
       - name: Tidy go.mod files
         run: go mod tidy
 
+      - name: Set up SSH based git operations
+        run: |
+          git config --global url."git@github.com:".insteadOf "https://github.com/"
+
+      - name: Set up Deploy key for private repository access
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW }}"
+
       - name: Verify
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: make ci
