@@ -16,6 +16,8 @@ on:
 env:
   # renovate: datasource=github-tags depName=goreleaser-pro packageName=goreleaser/goreleaser-pro
   GORELEASER_PRO_VERSION: v2.7.0
+  GONOSUMDB: github.com/axoflow/*
+  GOPRIVATE: github.com/axoflow/*
 
 jobs:
   check-goreleaser:
@@ -42,20 +44,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y wixl
 
-      - name: Setup mingw-w64 # Required to build Windows AMD64 packages
-        if: ${{ matrix.GOOS == 'windows' && matrix.GOARCH == 'amd64' }}
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y gcc-mingw-w64-x86-64-win32
-
-      - name: Setup llvm-mingw # Required to build Windows ARM64 packages
-        if: ${{ matrix.GOOS == 'windows' && matrix.GOARCH == 'arm64' }}
-        run: |
-          wget https://github.com/mstorsjo/llvm-mingw/releases/download/20250402/llvm-mingw-20250402-ucrt-ubuntu-20.04-x86_64.tar.xz
-          tar -xJf llvm-mingw-20250402-ucrt-ubuntu-20.04-x86_64.tar.xz
-          sudo mv llvm-mingw-20250402-ucrt-ubuntu-20.04-x86_64 /opt/llvm-mingw
-          sudo ln -s /opt/llvm-mingw/bin/aarch64-w64-mingw32-gcc /usr/local/bin/aarch64-w64-mingw32-gcc
-
       - name: Setup Docker Buildx
         uses: docker/setup-buildx-action@f7ce87c1d6bead3e36075b2ce75da1f6cc28aaca # v3.9.0
 
@@ -68,9 +56,21 @@ jobs:
       - name: Run version update script
         run: ./scripts/pre-update-version.sh --snapshot
 
+      - name: Set up SSH based git operations
+        run: |
+          git config --global url."git@github.com:".insteadOf "https://github.com/"
+
+      - name: Set up Deploy key for private repository access
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW }}"
+
       - name: Generate the sources for ${{ inputs.distribution }}
         env:
           DISTRIBUTIONS: ${{ inputs.distribution }}
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: make generate-sources
 
       - name: Run GoReleaser for ${{ inputs.distribution }}
@@ -85,6 +85,7 @@ jobs:
           GOARCH: ${{ matrix.GOARCH }}
           GOAMD64: v1
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
 
       - name: Print built artifacts
         run: cat ./distributions/${{ inputs.distribution }}/dist/**/artifacts.json

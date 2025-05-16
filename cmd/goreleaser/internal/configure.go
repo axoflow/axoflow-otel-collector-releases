@@ -44,8 +44,7 @@ var (
 	otelColDist = newDistributionBuilder(coreDistro).WithConfigFunc(func(d *distribution) {
 		d.buildConfigs = []buildConfig{
 			&fullBuildConfig{targetOS: "linux", targetArch: baseArchs},
-			&fullBuildConfig{targetOS: "windows", targetArch: []string{"amd64"}},
-			&fullBuildConfig{targetOS: "windows", targetArch: []string{"arm64"}},
+			&fullBuildConfig{targetOS: "windows", targetArch: baseArchs},
 		}
 		d.containerImages = newContainerImages(d.name, "linux", baseArchs, containerImageOptions{armVersion: "7"})
 		d.containerImageManifests = newContainerImageManifests(d.name, "linux", baseArchs)
@@ -71,11 +70,6 @@ func (b *distributionBuilder) WithDefaultArchives() *distributionBuilder {
 	b.configFuncs = append(b.configFuncs, func(d *distribution) {
 		builds := make([]string, 0, len(d.buildConfigs))
 		for _, build := range d.buildConfigs {
-			if build.OS() == "windows" {
-				builds = append(builds, fmt.Sprintf("%s-%s-%s", d.name, build.OS(), build.Arch()))
-				continue
-			}
-
 			builds = append(builds, fmt.Sprintf("%s-%s", d.name, build.OS()))
 		}
 		d.archives = b.newArchives(d.name, builds)
@@ -392,18 +386,6 @@ func (c *fullBuildConfig) Build(dist string) config.Build {
 		Goppc64: c.ppc64Version,
 	}
 
-	targetOS := c.targetOS
-	targetArch := c.targetArch[0]
-	if targetOS == "windows" {
-		buildConfig.Env = append(buildConfig.Env, "CGO_ENABLED=1")
-		buildConfig.ID = fmt.Sprintf("%s-%s-%s", dist, targetOS, targetArch)
-		switch targetArch {
-		case "amd64":
-			buildConfig.Env = append(buildConfig.Env, "CC=x86_64-w64-mingw32-gcc")
-		case "arm64":
-			buildConfig.Env = append(buildConfig.Env, "CC=aarch64-w64-mingw32-gcc")
-		}
-	}
 	return buildConfig
 }
 
