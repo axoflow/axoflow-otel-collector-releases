@@ -16,6 +16,8 @@ on:
 env:
   # renovate: datasource=github-tags depName=goreleaser-pro packageName=goreleaser/goreleaser-pro
   GORELEASER_PRO_VERSION: v2.7.0
+  GONOSUMDB: github.com/axoflow/*
+  GOPRIVATE: github.com/axoflow/*
 
 jobs:
   prepare:
@@ -68,7 +70,20 @@ jobs:
       - name: Run version update script
         run: ./scripts/pre-update-version.sh "${{ github.ref_name }}"
 
+      - name: Set up SSH based git operations
+        run: |
+          git config --global url."git@github.com:".insteadOf "https://github.com/"
+
+      - name: Set up Deploy key for private repository access
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+        run: |
+          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
+          ssh-add - <<< "${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW }}"
+
       - name: Generate distribution sources
+        env:
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: make generate-sources
 
       - name: Login to GitHub Package Registry
@@ -94,6 +109,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COSIGN_YES: true
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
 
       - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
