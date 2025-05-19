@@ -30,16 +30,11 @@ jobs:
       - name: Tidy go.mod files
         run: go mod tidy
 
-      - name: Set up SSH based git operations
-        run: |
-          git config --global url."git@github.com:".insteadOf "https://github.com/"
-
-      - name: Set up Deploy key for private repository access
+      - name: Setup private module access
         env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          DEPLOY_KEY_PRIVATE_FOR_AXO_ETW: ${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW}}
         run: |
-          ssh-agent -a $SSH_AUTH_SOCK > /dev/null
-          ssh-add - <<< "${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW }}"
+          ./scripts/prepare-private-modules-gha.sh
 
       - name: Verify
         env:
