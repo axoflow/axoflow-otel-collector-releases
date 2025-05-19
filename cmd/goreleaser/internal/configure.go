@@ -258,6 +258,7 @@ func (b *distributionBuilder) WithDefaultConfigIncluded() *distributionBuilder {
 	b.configFuncs = append(b.configFuncs, func(d *distribution) {
 		for i, container := range d.containerImages {
 			container.Files = append(container.Files, "linux_config.yaml")
+			container.Files = append(container.Files, "etw_library_license.txt")
 			d.containerImages[i] = container
 		}
 
@@ -272,6 +273,7 @@ func (b *distributionBuilder) WithDefaultConfigIncluded() *distributionBuilder {
 
 		for i := range d.msiConfig {
 			d.msiConfig[i].Files = append(d.msiConfig[i].Files, "windows_config.yaml")
+			d.msiConfig[i].Files = append(d.msiConfig[i].Files, "etw_library_license.txt")
 		}
 	})
 	return b
