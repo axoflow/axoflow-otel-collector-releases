@@ -29,6 +29,14 @@ service:
       # exporters: [otlp/axorouter]
       exporters: [nop]
   telemetry:
+    metrics:
+      level: basic
+      readers:
+        - pull:
+            exporter:
+              prometheus:
+                host: localhost
+                port: 8888
     logs:
       level: debug
       encoding: json

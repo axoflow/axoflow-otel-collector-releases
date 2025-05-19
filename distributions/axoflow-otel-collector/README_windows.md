@@ -46,7 +46,7 @@ The default configuration supports the following formats.
 
 The default configuration collects from the following channels: `application`, `system`, `security`.
 
-**NOTE: If you would like to include additonal channels you can use the following snippet and add it as a new receiver. (Don't forget to include the additonal receiver in the pipeline of your choice).**
+**NOTE: If you would like to include additional channels you can use the following snippet and add it as a new receiver. (Don't forget to include the additonal receiver in the pipeline of your choice).**
 
 ```yaml
 receivers:
@@ -98,6 +98,10 @@ receivers:
     include: ['<ESCAPED_DHCPV6_SERVER_LOGS_PATH>\\DhcpV6SrvLog*']
     ...
 ```
+
+### Metrics
+
+By default metrics are enabled on `basic` level and are available on `localhost:8888/metrics`.
 
 ## Support
 
