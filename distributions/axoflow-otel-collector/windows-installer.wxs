@@ -60,6 +60,10 @@
                         Name="README.md"
                         Source="README_windows.md"/>
                      <File
+                        Id="etw_library_license.txt"
+                        Name="etw_library_license.txt"
+                        Source="etw_library_license.txt"/>
+                     <File
                         Id="default_config.yaml"
                         Name="default_config.yaml"
                         Source="windows_config.yaml"/>
