@@ -47,6 +47,33 @@ jobs:
           go-version: "~1.24"
           check-latest: true
 
+      - name: Setup Google Cloud KMS for Windows code signing
+        if: ${{ matrix.GOOS == 'windows' }}
+        run: |
+          wget https://github.com/GoogleCloudPlatform/kms-integrations/releases/download/pkcs11-v1.5/libkmsp11-1.5-linux-amd64.tar.gz
+          tar -xzf libkmsp11-1.5-linux-amd64.tar.gz
+          sudo mkdir -p /usr/lib/x86_64-linux-gnu/pkcs11 && sudo cp libkmsp11-1.5-linux-amd64/libkmsp11.so /usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so
+
+          wget https://github.com/OpenSC/libp11/releases/download/libp11-0.4.16/libp11-0.4.16.tar.gz
+          tar -xzf libp11-0.4.16.tar.gz
+          sudo apt install -y pkgconf libssl-dev
+          ./libp11-0.4.16/configure && make
+          sudo make install
+
+          cat > /tmp/kmsp11-config.yaml << EOF
+          ---
+          tokens:
+            - key_ring: "projects/${{ secrets.EV_GCP_PROJECT_ID }}/locations/global/keyRings/${{ secrets.EV_GCP_KEY_RING }}"
+          libraries:
+            - /usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so
+
+          echo '${{ secrets.EV_CERTIFICATE_CRT }}' | base64 -d > /tmp/certificate.crt
+
+          echo "KMS_PKCS11_CONFIG=/tmp/kmsp11-config.yaml" >> $GITHUB_ENV
+          echo "PKCS11_MODULE_PATH=/usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so" >> $GITHUB_ENV
+          echo "CERTIFICATE_CRT_PATH=/tmp/certificate.crt" >> $GITHUB_ENV
+          echo "GCP_KEY_NAME=${{ secrets.EV_GCP_KEY_NAME }}" >> $GITHUB_ENV
+
       - name: Setup wixl # Required to build MSI packages for Windows
         if: ${{ matrix.GOOS == 'windows' }}
         run: |
@@ -91,6 +118,11 @@ jobs:
           COSIGN_YES: true
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          GOOGLE_APPLICATION_CREDENTIALS: ${{ env.GOOGLE_APPLICATION_CREDENTIALS }}
+          KMS_PKCS11_CONFIG: ${{ env.KMS_PKCS11_CONFIG }}
+          PKCS11_MODULE_PATH: ${{ env.PKCS11_MODULE_PATH }}
+          CERTIFICATE_CRT_PATH: ${{ env.CERTIFICATE_CRT_PATH }}
+          GCP_KEY_NAME: ${{ env.GCP_KEY_NAME }}
 
       - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
         with:
