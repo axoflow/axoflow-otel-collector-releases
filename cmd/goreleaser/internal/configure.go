@@ -175,6 +175,7 @@ func (b *distributionBuilder) WithDefaultSigns() *distributionBuilder {
 func (b *distributionBuilder) signs() []config.Sign {
 	return []config.Sign{
 		{
+			ID:          "cosign",
 			Artifacts:   "all",
 			Signature:   "${artifact}.sig",
 			Certificate: "${artifact}.pem",
@@ -187,6 +188,35 @@ func (b *distributionBuilder) signs() []config.Sign {
 				"${artifact}.pem",
 				"${artifact}",
 			},
+		},
+		{
+			ID:        "msi-code-sign",
+			Artifacts: "all",
+			Cmd:       "sh",
+			Args: []string{
+				"-c",
+				`
+osslsigncode sign \
+	-provider /usr/lib/x86_64-linux-gnu/ossl-modules/pkcs11prov.so \
+	-pkcs11module ${{ .Env.PKCS11_MODULE_PATH }} \
+	-key "pkcs11:object=${{ .Env.GCP_KEY_NAME }}" \
+	-n "Axoflow OpenTelemetry Collector" \
+	-i "https://axoflow.com" \
+	-h sha256 \
+	-t "http://timestamp.sectigo.com" \
+	-in "${artifact}" \
+	-out "${artifact}.signed" \
+	-certs ${{ .Env.CERTIFICATE_CRT_PATH }} && \
+mv "${artifact}.signed" "${artifact}"
+			`,
+			},
+			Env: []string{
+				"KMS_PKCS11_CONFIG={{ .Env.KMS_PKCS11_CONFIG }}",
+				"PKCS11_MODULE_PATH={{ .Env.PKCS11_MODULE_PATH }}",
+				"CERTIFICATE_CRT_PATH={{ .Env.CERTIFICATE_CRT_PATH }}",
+				"GCP_KEY_NAME={{ .Env.GCP_KEY_NAME }}",
+			},
+			If: `{{ eq .Os "windows" }}`,
 		},
 	}
 }
