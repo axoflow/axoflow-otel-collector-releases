@@ -47,6 +47,7 @@ ifeq (, $(shell command -v ocb 2>/dev/null))
 	CGO_ENABLED=0 go install -trimpath -ldflags="-s -w" go.opentelemetry.io/collector/cmd/builder@v$(OTELCOL_BUILDER_VERSION) ;\
 	mv $$(go env GOPATH)/bin/builder $(OTELCOL_BUILDER) ;\
 	}
+	go env -w GOPRIVATE="github.com/axoflow"
 else
 OTELCOL_BUILDER=$(shell command -v ocb)
 endif
