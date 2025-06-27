@@ -128,7 +128,8 @@ docker_manifests:
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-amd64
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-arm64
 signs:
-  - cmd: cosign
+  - id: cosign
+    cmd: cosign
     args:
       - sign-blob
       - --output-signature
@@ -139,6 +140,31 @@ signs:
     signature: ${artifact}.sig
     artifacts: all
     certificate: ${artifact}.pem
+  - id: msi-code-sign
+    cmd: sh
+    args:
+      - -c
+      - |2-
+        osslsigncode sign \
+        	-pkcs11engine /usr/local/lib/libkmsp11.so \
+        	-pkcs11module /usr/local/lib/libkmsp11.so \
+        	-certs "$CERTIFICATE_CRT_PATH" \
+        	-key "pkcs11:object=$GCP_KEY_NAME" \
+        	-n "Axoflow OpenTelemetry Collector" \
+        	-i "https://axoflow.com" \
+        	-h sha256 \
+        	-t "http://timestamp.sectigo.com?td=sha256" \
+        	-in "${artifact}" \
+        	-out "${artifact}.signed" && \
+        mv "${artifact}.signed" "${artifact}"
+        			
+    artifacts: all
+    if: '{{ eq .Os "windows" }}'
+    env:
+      - KMS_PKCS11_CONFIG={{ .Env.KMS_PKCS11_CONFIG }}
+      - GOOGLE_APPLICATION_CREDENTIALS={{ .Env.GOOGLE_APPLICATION_CREDENTIALS }}
+      - CERTIFICATE_CRT_PATH={{ .Env.CERTIFICATE_CRT_PATH }}
+      - GCP_KEY_NAME={{ .Env.GCP_KEY_NAME }}
 docker_signs:
   - args:
       - sign
