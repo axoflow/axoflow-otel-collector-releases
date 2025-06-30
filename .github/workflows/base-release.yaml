@@ -47,6 +47,13 @@ jobs:
           go-version: "~1.24"
           check-latest: true
 
+      - name: Google auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "${{ secrets.WIF_PROVIDER }}"
+          service_account: "${{ secrets.EV_WIF_SERVICE_ACCOUNT }}"
+          token_format: "access_token"
+
       - name: Setup Google Cloud KMS for Windows code signing
         if: ${{ matrix.GOOS == 'windows' }}
         run: |
@@ -67,7 +74,7 @@ jobs:
           libraries:
             - /usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so
 
-          echo '${{ secrets.EV_CERTIFICATE_CRT }}' | base64 -d > /tmp/certificate.crt
+          echo "${{ secrets.EV_CERTIFICATE_CRT }}" | base64 -d > /tmp/certificate.crt
 
           echo "KMS_PKCS11_CONFIG=/tmp/kmsp11-config.yaml" >> $GITHUB_ENV
           echo "PKCS11_MODULE_PATH=/usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so" >> $GITHUB_ENV
@@ -118,7 +125,6 @@ jobs:
           COSIGN_YES: true
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
           SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-          GOOGLE_APPLICATION_CREDENTIALS: ${{ env.GOOGLE_APPLICATION_CREDENTIALS }}
           KMS_PKCS11_CONFIG: ${{ env.KMS_PKCS11_CONFIG }}
           PKCS11_MODULE_PATH: ${{ env.PKCS11_MODULE_PATH }}
           CERTIFICATE_CRT_PATH: ${{ env.CERTIFICATE_CRT_PATH }}
