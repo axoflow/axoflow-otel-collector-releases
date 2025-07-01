@@ -207,7 +207,8 @@ osslsigncode sign \
 	-in "${artifact}" \
 	-out "${artifact}.signed" \
 	-certs "$CERTIFICATE_CRT_PATH" && \
-mv "${artifact}.signed" "${artifact}"
+cp -f "${artifact}.signed" "${artifact}" && \
+rm -f "${artifact}.signed"
 			`,
 			},
 			If: `{{ eq .Os "windows" }}`,
