@@ -175,7 +175,7 @@ func (b *distributionBuilder) WithDefaultSigns() *distributionBuilder {
 func (b *distributionBuilder) signs() []config.Sign {
 	return []config.Sign{
 		{
-			ID:          "cosign",
+			ID:          "linux-cosign",
 			Artifacts:   "all",
 			Signature:   "${artifact}.sig",
 			Certificate: "${artifact}.pem",
@@ -188,6 +188,7 @@ func (b *distributionBuilder) signs() []config.Sign {
 				"${artifact}.pem",
 				"${artifact}",
 			},
+			If: `{{ eq .Os "linux" }}`,
 		},
 		{
 			ID:        "msi-code-sign",

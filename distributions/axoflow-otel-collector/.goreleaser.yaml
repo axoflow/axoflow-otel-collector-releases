@@ -128,7 +128,7 @@ docker_manifests:
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-amd64
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-arm64
 signs:
-  - id: cosign
+  - id: linux-cosign
     cmd: cosign
     args:
       - sign-blob
@@ -139,6 +139,7 @@ signs:
       - ${artifact}
     signature: ${artifact}.sig
     artifacts: all
+    if: '{{ eq .Os "linux" }}'
     certificate: ${artifact}.pem
   - id: msi-code-sign
     cmd: sh
