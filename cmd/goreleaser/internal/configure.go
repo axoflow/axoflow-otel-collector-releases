@@ -193,6 +193,7 @@ func (b *distributionBuilder) signs() []config.Sign {
 		{
 			ID:        "msi-code-sign",
 			Artifacts: "installer",
+			Signature: "${artifact}.sig",
 			Cmd:       "sh",
 			Args: []string{
 				"-c",
@@ -206,7 +207,7 @@ osslsigncode sign \
 	-h sha256 \
 	-t "http://timestamp.sectigo.com" \
 	-in "${artifact}" \
-	-out "${artifact}.signed" \
+	-out "${artifact}.sig" \
 	-certs "$CERTIFICATE_CRT_PATH"
 `,
 			},
