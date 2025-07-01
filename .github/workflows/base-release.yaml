@@ -64,8 +64,9 @@ jobs:
           wget https://github.com/OpenSC/libp11/releases/download/libp11-0.4.16/libp11-0.4.16.tar.gz
           tar -xzf libp11-0.4.16.tar.gz
           sudo apt install -y pkgconf libssl-dev
-          ./libp11-0.4.16/configure && make
+          cd libp11-0.4.16 && ./configure && make
           sudo make install
+          cd ..
 
           cat > /tmp/kmsp11-config.yaml << EOF
           ---
@@ -73,6 +74,7 @@ jobs:
             - key_ring: "projects/${{ secrets.EV_GCP_PROJECT_ID }}/locations/global/keyRings/${{ secrets.EV_GCP_KEY_RING }}"
           libraries:
             - /usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so
+          EOF
 
           echo "${{ secrets.EV_CERTIFICATE_CRT }}" | base64 -d > /tmp/certificate.crt
 
