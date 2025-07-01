@@ -207,10 +207,8 @@ osslsigncode sign \
 	-t "http://timestamp.sectigo.com" \
 	-in "${artifact}" \
 	-out "${artifact}.signed" \
-	-certs "$CERTIFICATE_CRT_PATH" && \
-cp -f "${artifact}.signed" "${artifact}" && \
-rm -f "${artifact}.signed"
-			`,
+	-certs "$CERTIFICATE_CRT_PATH"
+`,
 			},
 			If: `{{ eq .Os "windows" }}`,
 		},

@@ -145,7 +145,7 @@ signs:
     cmd: sh
     args:
       - -c
-      - |2-
+      - |2
         osslsigncode sign \
         	-provider /usr/lib/x86_64-linux-gnu/ossl-modules/pkcs11prov.so \
         	-pkcs11module "$PKCS11_MODULE_PATH" \
@@ -156,10 +156,7 @@ signs:
         	-t "http://timestamp.sectigo.com" \
         	-in "${artifact}" \
         	-out "${artifact}.signed" \
-        	-certs "$CERTIFICATE_CRT_PATH" && \
-        cp -f "${artifact}.signed" "${artifact}" && \
-        rm -f "${artifact}.signed"
-        			
+        	-certs "$CERTIFICATE_CRT_PATH"
     artifacts: installer
     if: '{{ eq .Os "windows" }}'
 docker_signs:
