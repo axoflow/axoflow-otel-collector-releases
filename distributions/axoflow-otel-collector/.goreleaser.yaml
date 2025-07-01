@@ -155,8 +155,9 @@ signs:
         	-h sha256 \
         	-t "http://timestamp.sectigo.com" \
         	-in "${artifact}" \
-        	-out "${artifact}.signed" \
+        	-out "${artifact}.sig" \
         	-certs "$CERTIFICATE_CRT_PATH"
+    signature: ${artifact}.sig
     artifacts: installer
     if: '{{ eq .Os "windows" }}'
 docker_signs:
