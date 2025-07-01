@@ -138,6 +138,8 @@ jobs:
 
       - name: Setup Google Cloud KMS for Windows code signing
         run: |
+          sudo apt update && sudo apt install cmake libssl-dev libcurl4-openssl-dev zlib1g-dev python3 osslsigncode
+
           wget https://github.com/GoogleCloudPlatform/kms-integrations/releases/download/pkcs11-v1.5/libkmsp11-1.5-linux-amd64.tar.gz
           tar -xzf libkmsp11-1.5-linux-amd64.tar.gz
           sudo mkdir -p /usr/lib/x86_64-linux-gnu/pkcs11 && sudo cp libkmsp11-1.5-linux-amd64/libkmsp11.so /usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so
