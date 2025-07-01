@@ -137,7 +137,6 @@ jobs:
           token_format: "access_token"
 
       - name: Setup Google Cloud KMS for Windows code signing
-        if: ${{ matrix.GOOS == 'windows' }}
         run: |
           wget https://github.com/GoogleCloudPlatform/kms-integrations/releases/download/pkcs11-v1.5/libkmsp11-1.5-linux-amd64.tar.gz
           tar -xzf libkmsp11-1.5-linux-amd64.tar.gz
