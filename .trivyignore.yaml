@@ -1,3 +1,5 @@
 misconfigurations:
   - id: AVD-DS-0026
     statement: The image will be used in Kubernetes environment, so healthcheck will be implemented via liveness probe.
+  - id: AVD-DS-0002
+    statement: The image that triggers this, requires elevated permissions during runtime. This is not a problem for the Axoflow-signer image, as it is used to sign Windows executables.
