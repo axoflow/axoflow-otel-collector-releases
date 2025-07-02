@@ -161,10 +161,9 @@ signs:
             -pkcs11module "$PKCS11_MODULE_PATH" \
             -key "pkcs11:object=$GCP_KEY_NAME" \
             -n "Axoflow OpenTelemetry Collector" \
-            -i "./work/${artifact}" \
-            -t "http://timestamp.sectigo.com" \
+            -i "https://axoflow.com" \
             -h sha256 \
-            -c "https://axoflow.com" \
+            -t "http://timestamp.sectigo.com" \
             -in "/work/msi/***/${artifact}" \
             -out "/work/msi/***/${artifact}" \
             -certs "$CERTIFICATE_CRT_PATH"
