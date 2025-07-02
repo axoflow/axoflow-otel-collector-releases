@@ -13,7 +13,7 @@ set -euo pipefail
 IMAGE_REPO=${DOCKER_IMAGE_REPO:-axoflow/signer}
 BASE_IMAGE=${DOCKER_BASE_IMAGE:-debian:stable-slim}
 OSSLSIGNCODE_VERSION=${OSSLSIGNCODE_VERSION:-latest}
-DOCKERFILE=${DOCKERFILE:-Dockerfile}
+DOCKERFILE=${DOCKERFILE:-signer-image/Dockerfile}
 
 # Generate image tag
 if [[ $OSSLSIGNCODE_VERSION == "latest" ]]; then
