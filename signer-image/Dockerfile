@@ -73,6 +73,9 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     wget \
     sudo \
     pkgconf \
+    make \
+    build-essential \
+    libssl-dev \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /osslsigncode/build/osslsigncode /usr/local/bin/osslsigncode
