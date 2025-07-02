@@ -138,19 +138,6 @@ jobs:
 
       - name: Setup Google Cloud KMS for Windows code signing
         run: |
-          sudo apt update && sudo apt install cmake libssl-dev libcurl4-openssl-dev zlib1g-dev python3 osslsigncode
-
-          wget https://github.com/GoogleCloudPlatform/kms-integrations/releases/download/pkcs11-v1.5/libkmsp11-1.5-linux-amd64.tar.gz
-          tar -xzf libkmsp11-1.5-linux-amd64.tar.gz
-          sudo mkdir -p /usr/lib/x86_64-linux-gnu/pkcs11 && sudo cp libkmsp11-1.5-linux-amd64/libkmsp11.so /usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so
-
-          wget https://github.com/OpenSC/libp11/releases/download/libp11-0.4.16/libp11-0.4.16.tar.gz
-          tar -xzf libp11-0.4.16.tar.gz
-          sudo apt install -y pkgconf libssl-dev
-          cd libp11-0.4.16 && ./configure && make
-          sudo make install
-          cd ..
-
           cat > /tmp/kmsp11-config.yaml << EOF
           ---
           tokens:
@@ -162,9 +149,11 @@ jobs:
           echo "${{ secrets.EV_CERTIFICATE_CRT }}" | base64 -d > /tmp/certificate.crt
 
           echo "KMS_PKCS11_CONFIG=/tmp/kmsp11-config.yaml" >> $GITHUB_ENV
-          echo "PKCS11_MODULE_PATH=/usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so" >> $GITHUB_ENV
           echo "CERTIFICATE_CRT_PATH=/tmp/certificate.crt" >> $GITHUB_ENV
           echo "GCP_KEY_NAME=${{ secrets.EV_GCP_KEY_NAME }}" >> $GITHUB_ENV
+
+      - name: Build Axoflow-signer
+        run: ./signer-image/build.sh
 
       - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
         with:

@@ -146,17 +146,28 @@ signs:
     args:
       - -c
       - |2
-        osslsigncode sign \
-        	-provider /usr/lib/x86_64-linux-gnu/ossl-modules/pkcs11prov.so \
-        	-pkcs11module "$PKCS11_MODULE_PATH" \
-        	-key "pkcs11:object=$GCP_KEY_NAME" \
-        	-n "Axoflow OpenTelemetry Collector" \
-        	-i "https://axoflow.com" \
-        	-h sha256 \
-        	-t "http://timestamp.sectigo.com" \
-        	-in "${artifact}" \
-        	-out "${artifact}.sig" \
-        	-certs "$CERTIFICATE_CRT_PATH"
+        docker run --rm \
+          -v ./dist:/work \
+          -v ${GOOGLE_GHA_CREDS_PATH}:/creds.json:ro \
+          -v /tmp/kmsp11-config.yaml:/tmp/kmsp11-config.yaml:ro \
+          -v /tmp/certificate.crt:/tmp/certificate.crt:ro \
+          -e GOOGLE_APPLICATION_CREDENTIALS="/creds.json" \
+          -e KMS_PKCS11_CONFIG=${KMS_PKCS11_CONFIG} \
+          -e CERTIFICATE_CRT_PATH=${CERTIFICATE_CRT_PATH} \
+          -e GCP_KEY_NAME=${GCP_KEY_NAME} \
+          axoflow/signer:latest \
+          sign \
+            -provider /usr/lib/x86_64-linux-gnu/ossl-modules/pkcs11prov.so \
+            -pkcs11module "$PKCS11_MODULE_PATH" \
+            -key "pkcs11:object=$GCP_KEY_NAME" \
+            -n "Axoflow OpenTelemetry Collector" \
+            -i "./work/${artifact}" \
+            -t "http://timestamp.sectigo.com" \
+            -h sha256 \
+            -c "https://axoflow.com" \
+            -in "/work/msi/***/${artifact}" \
+            -out "/work/msi/***/${artifact}" \
+            -certs "$CERTIFICATE_CRT_PATH"
     signature: ${artifact}.sig
     artifacts: installer
     if: '{{ eq .Os "windows" }}'
