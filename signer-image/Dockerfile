@@ -72,6 +72,7 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     netbase \
     wget \
     sudo \
+    python3 \
     pkgconf \
     make \
     build-essential \
@@ -98,7 +99,7 @@ EOF
 
 RUN mkdir /work && chmod 555 /usr/local/bin/osslsigncode
 
-ENV PKCS11_MODULE_PATH=/usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so 
+ENV PKCS11_MODULE_PATH=/usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so
 
 LABEL \
   org.opencontainers.image.title="osslsigncode" \

@@ -145,6 +145,7 @@ jobs:
           libraries:
             - /usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so
           EOF
+          chmod 600 /tmp/kmsp11-config.yaml
 
           echo "${{ secrets.EV_CERTIFICATE_CRT }}" | base64 -d > /tmp/certificate.crt
 
@@ -182,7 +183,6 @@ jobs:
           COSIGN_YES: true
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
           KMS_PKCS11_CONFIG: ${{ env.KMS_PKCS11_CONFIG }}
-          PKCS11_MODULE_PATH: ${{ env.PKCS11_MODULE_PATH }}
           CERTIFICATE_CRT_PATH: ${{ env.CERTIFICATE_CRT_PATH }}
           GCP_KEY_NAME: ${{ env.GCP_KEY_NAME }}
 
