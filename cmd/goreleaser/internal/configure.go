@@ -190,39 +190,6 @@ func (b *distributionBuilder) signs() []config.Sign {
 			},
 			If: `{{ eq .Os "linux" }}`,
 		},
-		{
-			ID:        "msi-code-sign",
-			Artifacts: "installer",
-			Cmd:       "sh",
-			Args: []string{
-				"-c",
-				`
-docker run --rm \
-  -v ./dist:/work \
-  -v ${GOOGLE_GHA_CREDS_PATH}:/creds.json:ro \
-  -v ${KMS_PKCS11_CONFIG}:${KMS_PKCS11_CONFIG} \
-  -v ${CERTIFICATE_CRT_PATH}:${CERTIFICATE_CRT_PATH} \
-  -e GOOGLE_APPLICATION_CREDENTIALS="/creds.json" \
-  -e KMS_PKCS11_CONFIG=${KMS_PKCS11_CONFIG} \
-  -e CERTIFICATE_CRT_PATH=${CERTIFICATE_CRT_PATH} \
-  -e GCP_KEY_NAME=${GCP_KEY_NAME} \
-  axoflow/signer:latest \
-  sign \
-    -provider /usr/lib/x86_64-linux-gnu/ossl-modules/pkcs11prov.so \
-    -pkcs11module "$PKCS11_MODULE_PATH" \
-    -key "pkcs11:object=$GCP_KEY_NAME" \
-    -certs "$CERTIFICATE_CRT_PATH" \
-    -n "Axoflow OpenTelemetry Collector" \
-    -i "https://axoflow.com" \
-    -h sha256 \
-    -t "http://timestamp.sectigo.com" \
-    -in "/work/{{ .ArtifactPath }}" \
-    -out "/work/{{ dir .ArtifactPath }}/signed-{{ base .ArtifactPath }}" &&
-mv "/work/{{ dir .ArtifactPath }}/signed-{{ base .ArtifactPath }}" "/work/{{ .ArtifactPath }}"
-`,
-			},
-			If: `{{ eq .Os "windows" }}`,
-		},
 	}
 }
 
