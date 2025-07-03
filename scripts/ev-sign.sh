@@ -21,15 +21,16 @@ echo "$MSI_FILES" | while IFS= read -r msi_file; do
 
     docker run --rm \
         -v "$abs_msi_file:/work/$filename" \
-        -v "${KMS_PKCS11_CONFIG}:${KMS_PKCS11_CONFIG}" \
-        -v "${CERTIFICATE_CRT_PATH}:${CERTIFICATE_CRT_PATH}" \
         -v "/tmp/signed-msi:/work/signed" \
+        -v "${GOOGLE_GHA_CREDS_PATH}:/creds.json:ro" \
+        -v "${KMS_PKCS11_CONFIG}:${KMS_PKCS11_CONFIG}:ro" \
+        -v "${CERTIFICATE_CRT_PATH}:${CERTIFICATE_CRT_PATH}:ro" \
         -e GOOGLE_APPLICATION_CREDENTIALS="/creds.json" \
         -e KMS_PKCS11_CONFIG="${KMS_PKCS11_CONFIG}" \
         -e CERTIFICATE_CRT_PATH="${CERTIFICATE_CRT_PATH}" \
         -e GCP_KEY_NAME="${GCP_KEY_NAME}" \
         axoflow/signer:latest \
-        osslsigncode sign \
+        sign \
             -provider /usr/lib/x86_64-linux-gnu/ossl-modules/pkcs11prov.so \
             -pkcs11module /usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so \
             -key "pkcs11:object=${GCP_KEY_NAME}" \
