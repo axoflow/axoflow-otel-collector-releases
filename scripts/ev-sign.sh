@@ -2,7 +2,6 @@
 set -e
 
 MSI_FILES=$(find "distributions/axoflow-otel-collector/dist" -name "*.msi" -type f)
-
 if [ -z "$MSI_FILES" ]; then
     echo "No MSI files found to sign"
     exit 0
@@ -16,10 +15,12 @@ mkdir -p /tmp/signed-msi
 echo "$MSI_FILES" | while IFS= read -r msi_file; do
     echo "Signing: $msi_file"
 
+    abs_msi_file=$(realpath "$msi_file")
     filename=$(basename "$msi_file")
     signed_filename="signed_${filename}"
+
     docker run --rm \
-        -v "$msi_file:/work/$filename" \
+        -v "$abs_msi_file:/work/$filename" \
         -v "${KMS_PKCS11_CONFIG}:${KMS_PKCS11_CONFIG}" \
         -v "${CERTIFICATE_CRT_PATH}:${CERTIFICATE_CRT_PATH}" \
         -v "/tmp/signed-msi:/work/signed" \
