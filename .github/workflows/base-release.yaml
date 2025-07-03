@@ -136,23 +136,6 @@ jobs:
           service_account: "${{ secrets.EV_WIF_SERVICE_ACCOUNT }}"
           token_format: "access_token"
 
-      - name: Setup Google Cloud KMS for Windows code signing
-        run: |
-          cat > /tmp/kmsp11-config.yaml << EOF
-          ---
-          tokens:
-            - key_ring: "projects/${{ secrets.EV_GCP_PROJECT_ID }}/locations/global/keyRings/${{ secrets.EV_GCP_KEY_RING }}"
-          libraries:
-            - /usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so
-          EOF
-          chmod 600 /tmp/kmsp11-config.yaml
-
-          echo "${{ secrets.EV_CERTIFICATE_CRT }}" | base64 -d > /tmp/certificate.crt
-
-          echo "KMS_PKCS11_CONFIG=/tmp/kmsp11-config.yaml" >> $GITHUB_ENV
-          echo "CERTIFICATE_CRT_PATH=/tmp/certificate.crt" >> $GITHUB_ENV
-          echo "GCP_KEY_NAME=${{ secrets.EV_GCP_KEY_NAME }}" >> $GITHUB_ENV
-
       - name: Build Axoflow-signer
         run: signer-image/build-signer.sh
 
@@ -172,6 +155,24 @@ jobs:
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Setup Google Cloud KMS for Windows MSI code signing
+        run: |
+          cat > /tmp/kmsp11-config.yaml << EOF
+          ---
+          tokens:
+            - key_ring: "projects/${{ secrets.EV_GCP_PROJECT_ID }}/locations/global/keyRings/${{ secrets.EV_GCP_KEY_RING }}"
+          EOF
+          chmod 600 /tmp/kmsp11-config.yaml
+
+          echo "${{ secrets.EV_CERTIFICATE_CRT }}" | base64 -d > /tmp/certificate.crt
+
+          echo "KMS_PKCS11_CONFIG=/tmp/kmsp11-config.yaml" >> $GITHUB_ENV
+          echo "CERTIFICATE_CRT_PATH=/tmp/certificate.crt" >> $GITHUB_ENV
+          echo "GCP_KEY_NAME=${{ secrets.EV_GCP_KEY_NAME }}" >> $GITHUB_ENV
+
+      - name: Sign Windows MSI installers
+        run: ./scripts/ev-sign.sh
+
       - uses: goreleaser/goreleaser-action@90a3faa9d0182683851fbfa97ca1a2cb983bfca3 # v6.2.1
         with:
           distribution: goreleaser-pro
@@ -182,9 +183,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COSIGN_YES: true
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
-          KMS_PKCS11_CONFIG: ${{ env.KMS_PKCS11_CONFIG }}
-          CERTIFICATE_CRT_PATH: ${{ env.CERTIFICATE_CRT_PATH }}
-          GCP_KEY_NAME: ${{ env.GCP_KEY_NAME }}
 
       - name: Upload artifacts
         uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
