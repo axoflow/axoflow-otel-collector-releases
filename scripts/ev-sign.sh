@@ -1,12 +1,7 @@
 #!/bin/bash
 set -e
 
-if [ -z "$DISTRIBUTION" ]; then
-    echo "ERROR: DISTRIBUTION environment variable is not set"
-    exit 1
-fi
-
-MSI_FILES=$(find "distributions/$DISTRIBUTION/dist" -name "*.msi" -type f)
+MSI_FILES=$(find "distributions/axoflow-otel-collector/dist" -name "*.msi" -type f)
 
 if [ -z "$MSI_FILES" ]; then
     echo "No MSI files found to sign"
