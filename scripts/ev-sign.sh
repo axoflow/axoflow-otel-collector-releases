@@ -19,7 +19,8 @@ echo "$MSI_FILES" | while IFS= read -r msi_file; do
     filename=$(basename "$msi_file")
     signed_filename="signed_${filename}"
 
-    docker run --rm \
+    log_file=$(mktemp)
+    if ! docker run --rm \
         -v "$abs_msi_file:/work/$filename" \
         -v "/tmp/signed-msi:/work/signed" \
         -v "${GOOGLE_GHA_CREDS_PATH}:/creds.json:ro" \
@@ -40,8 +41,15 @@ echo "$MSI_FILES" | while IFS= read -r msi_file; do
             -h sha256 \
             -t "http://timestamp.sectigo.com" \
             -in "/work/$filename" \
-            -out "/work/signed/$signed_filename"
-
+            -out "/work/signed/$signed_filename" > "$log_file" 2>&1; then
+        echo "ERROR: Docker signing command failed for $filename"
+        echo "Error details:"
+        cat "$log_file"
+        rm -f "$log_file"
+        exit 1
+    fi
+    rm -f "$log_file"
+    
     if [ -f "/tmp/signed-msi/$signed_filename" ]; then
         echo "Successfully signed: $filename"
 
