@@ -20,7 +20,7 @@ exporters:
   - gomod: go.opentelemetry.io/collector/exporter/nopexporter v0.129.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.129.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusexporter v0.129.0
-  - gomod: github.com/axoflow/fluentforwardexporter v0.129.0-axoflow.rc2
+  - gomod: github.com/axoflow/fluentforwardexporter v0.129.0-axoflow.0
 
 processors:
   - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.129.0
@@ -57,9 +57,8 @@ replaces:
   # see https://github.com/openshift/api/pull/1515
   - github.com/openshift/api => github.com/openshift/api v0.0.0-20230726162818-81f778f3b3ec
   # Axoflow specific replacements for patched/additional components
-  - github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/countconnector v0.129.0-axoflow.rc1
-  - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.129.0-axoflow.rc1
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.129.0-axoflow.rc1
+  - github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/countconnector v0.129.0-axoflow.0
+  - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.129.0-axoflow.0
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.129.0-axoflow.0
   # Vulnerability patches
   - github.com/go-viper/mapstructure/v2 => github.com/go-viper/mapstructure/v2 v2.3.0
-
