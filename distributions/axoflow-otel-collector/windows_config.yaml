@@ -2,15 +2,19 @@ receivers:
   windowseventlog/application:
     channel: application
     raw: true
+    storage: file_storage
   windowseventlog/system:
     channel: system
     raw: true
+    storage: file_storage
   windowseventlog/security:
     channel: security
     raw: true
+    storage: file_storage
 
   filelog/windows_dns_debug_log:
     include: ['']
+    storage: file_storage
     resource:
       com.axoflow.vendor: microsoft
       com.axoflow.product: windows-dns
@@ -20,6 +24,7 @@ receivers:
 
   filelog/windows_dhcp_server_v4_auditlog:
     include: ['']
+    storage: file_storage
     start_at: beginning
     resource:
       com.axoflow.vendor: microsoft
@@ -32,6 +37,7 @@ receivers:
 
   filelog/windows_dhcp_server_v6_auditlog:
     include: ['']
+    storage: file_storage
     start_at: beginning
     resource:
       com.axoflow.vendor: microsoft

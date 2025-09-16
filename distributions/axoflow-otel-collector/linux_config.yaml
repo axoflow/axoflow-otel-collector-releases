@@ -1,6 +1,7 @@
 receivers:
   filelog/system:
     include: ['/var/log/*.log']
+    storage: file_storage
 
 exporters:
   otlp/axorouter:
