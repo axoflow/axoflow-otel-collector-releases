@@ -61,3 +61,4 @@ replaces:
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.129.0-axoflow.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.129.0-axoflow.0
   # Vulnerability patches
+  - github.com/go-viper/mapstructure/v2 => github.com/go-viper/mapstructure/v2 v2.4.0
