@@ -14,6 +14,9 @@ receivers:
 
   filelog/windows_dns_debug_log:
     include: ['']
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
     storage: file_storage
     resource:
       com.axoflow.vendor: microsoft
@@ -24,6 +27,9 @@ receivers:
 
   filelog/windows_dhcp_server_v4_auditlog:
     include: ['']
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
     storage: file_storage
     start_at: beginning
     resource:
@@ -37,6 +43,9 @@ receivers:
 
   filelog/windows_dhcp_server_v6_auditlog:
     include: ['']
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
     storage: file_storage
     start_at: beginning
     resource:

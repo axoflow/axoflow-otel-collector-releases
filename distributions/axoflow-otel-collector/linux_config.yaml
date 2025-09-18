@@ -1,6 +1,9 @@
 receivers:
   filelog/system:
     include: ['/var/log/*.log']
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
     storage: file_storage
 
 exporters:
