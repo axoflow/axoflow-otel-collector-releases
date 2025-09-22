@@ -2,14 +2,23 @@ receivers:
   windowseventlog/application:
     channel: application
     raw: true
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
     storage: file_storage
   windowseventlog/system:
     channel: system
     raw: true
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
     storage: file_storage
   windowseventlog/security:
     channel: security
     raw: true
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
     storage: file_storage
 
   filelog/windows_dns_debug_log:
