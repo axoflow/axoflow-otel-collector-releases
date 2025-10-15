@@ -66,6 +66,8 @@ receivers:
       -  type: filter
          expr: '!(body matches "^[0-9]+,.*$")'
 
+  nop:
+
 processors:
   resourcedetection/system:
     detectors: ["system", "env"]
@@ -116,18 +118,18 @@ service:
               host: localhost
               port: 8888
   pipelines:
-    logs/eventlog:
-      receivers: [windowseventlog/application, windowseventlog/system, windowseventlog/security]
-      processors: [resource/agent, resourcedetection/system]
-      # exporters: [otlp/axorouter]
-      exporters: [nop]
-    logs/dns:
-      receivers: [filelog/windows_dns_debug_log]
-      processors: [resource/agent, resourcedetection/system]
-      # exporters: [otlp/axorouter]
-      exporters: [nop]
-    logs/dhcp:
-      receivers: [filelog/windows_dhcp_server_v4_auditlog, filelog/windows_dhcp_server_v6_auditlog]
-      processors: [resource/agent, resourcedetection/system]
-      # exporters: [otlp/axorouter]
-      exporters: [nop]
+      logs/nop:
+        receivers: [nop]
+        exporters: [nop]
+    # logs/eventlog:
+    #   receivers: [windowseventlog/application, windowseventlog/system, windowseventlog/security]
+    #   processors: [resource/agent, resourcedetection/system]
+    #   exporters: [otlp/axorouter]
+    # logs/dns:
+    #   receivers: [filelog/windows_dns_debug_log]
+    #   processors: [resource/agent, resourcedetection/system]
+    #   exporters: [otlp/axorouter]
+    # logs/dhcp:
+    #   receivers: [filelog/windows_dhcp_server_v4_auditlog, filelog/windows_dhcp_server_v6_auditlog]
+    #   processors: [resource/agent, resourcedetection/system]
+    #   exporters: [otlp/axorouter]
