@@ -2,7 +2,7 @@ dist:
   module: github.com/axoflow/axoflow-otel-collector-releases
   name: axoflow-otel-collector
   description: Axoflow Distribution for OpenTelemetry Collector
-  version: 0.129.0-axoflow.1
+  version: 0.129.0-axoflow.2
   output_path: ./_build
 
 extensions:
