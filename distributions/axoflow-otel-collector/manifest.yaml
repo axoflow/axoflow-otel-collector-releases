@@ -60,7 +60,7 @@ replaces:
   # Axoflow specific replacements for patched/additional components
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/countconnector v0.129.0-axoflow.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.129.0-axoflow.0
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.129.0-axoflow.1
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.129.0-axoflow.2
   - github.com/opentelemetry/opentelemetry-collector-contrib/pkg/stanza => github.com/axoflow/opentelemetry-collector-contrib/pkg/stanza v0.129.0-axoflow.2
   # Vulnerability patches
   - github.com/go-viper/mapstructure/v2 => github.com/go-viper/mapstructure/v2 v2.4.0
