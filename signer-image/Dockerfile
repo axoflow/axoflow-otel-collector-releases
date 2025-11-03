@@ -5,13 +5,14 @@
 # SPDX-License-Identifier: Apache-2.0
 # SPDX-ArtifactOfProjectHomePage: https://github.com/vegardit/docker-osslsigncode
 
-ARG BASE_IMAGE=debian:stable-slim
+ARG BASE_IMAGE=debian
+ARG BASE_IMAGE_VERSION=stable-slim@sha256:a771c85b2287eae7ce8fe0a4c2637d575c5d991555ae680c187c5572153648d9
 
-FROM ${BASE_IMAGE} AS builder
+FROM ${BASE_IMAGE}:${BASE_IMAGE_VERSION} AS builder
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG LC_ALL=C
-ARG OSSLSIGNCODE_VERSION=latest
+ARG VERSION=2.10
 
 SHELL ["/bin/bash", "-euo", "pipefail", "-c"]
 
@@ -32,10 +33,6 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
     && rm -rf /var/lib/apt/lists/*
 
 RUN <<EOF
-  if [ "$OSSLSIGNCODE_VERSION" = "latest" ]; then
-    OSSLSIGNCODE_VERSION=$(curl -s https://api.github.com/repos/mtrojnar/osslsigncode/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-  fi
-  
   curl -fsS "https://codeload.github.com/mtrojnar/osslsigncode/tar.gz/refs/tags/$OSSLSIGNCODE_VERSION" | tar xvz
   mv osslsigncode-* osslsigncode
   cd osslsigncode
@@ -58,7 +55,7 @@ RUN <<EOF
   ./osslsigncode --version
 EOF
 
-FROM ${BASE_IMAGE} AS final
+FROM ${BASE_IMAGE}:${BASE_IMAGE_VERSION} AS final
 
 ARG DEBIAN_FRONTEND=noninteractive
 ARG LC_ALL=C
