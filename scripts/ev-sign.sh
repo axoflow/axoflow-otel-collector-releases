@@ -1,6 +1,8 @@
 #!/bin/bash
 set -e
 
+TAG="${1:-latest}"
+
 MSI_FILES=$(find "distributions/axoflow-otel-collector/dist" -name "*.msi" -type f)
 if [ -z "$MSI_FILES" ]; then
     echo "No MSI files found to sign"
@@ -30,7 +32,7 @@ echo "$MSI_FILES" | while IFS= read -r msi_file; do
         -e KMS_PKCS11_CONFIG="${KMS_PKCS11_CONFIG}" \
         -e CERTIFICATE_CRT_PATH="${CERTIFICATE_CRT_PATH}" \
         -e GCP_KEY_NAME="${GCP_KEY_NAME}" \
-        axoflow/signer:latest \
+        axoflow/signer:${TAG} \
         sign \
             -provider /usr/lib/x86_64-linux-gnu/ossl-modules/pkcs11prov.so \
             -pkcs11module /usr/lib/x86_64-linux-gnu/pkcs11/libkmsp11.so \
