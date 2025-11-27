@@ -2,7 +2,7 @@ dist:
   module: github.com/axoflow/axoflow-otel-collector-releases
   name: axoflow-otel-collector
   description: Axoflow Distribution for OpenTelemetry Collector
-  version: 0.129.0-axoflow.2
+  version: 0.129.0-axoflow.3
   output_path: ./_build
 
 extensions:
@@ -41,6 +41,7 @@ receivers:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowseventlogreceiver v0.129.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver v0.129.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kafkareceiver v0.129.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver v0.129.0
 
 connectors:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector v0.129.0
@@ -61,6 +62,7 @@ replaces:
   # Axoflow specific replacements for patched/additional components
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/countconnector v0.129.0-axoflow.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.129.0-axoflow.0
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/crowdstrikereceiver v0.129.0-axoflow.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.129.0-axoflow.2
   - github.com/opentelemetry/opentelemetry-collector-contrib/pkg/stanza => github.com/axoflow/opentelemetry-collector-contrib/pkg/stanza v0.129.0-axoflow.2
   # Vulnerability patches

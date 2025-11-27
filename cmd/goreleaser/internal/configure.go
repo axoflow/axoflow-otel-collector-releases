@@ -256,11 +256,18 @@ func (b *distributionBuilder) WithConfigFunc(configFunc func(*distribution)) *di
 	return b
 }
 
+func LicenseFiles() []string {
+	return []string{
+		"etw_library_license.txt",
+		"gofalcon_library_license.txt",
+	}
+}
+
 func (b *distributionBuilder) WithDefaultConfigIncluded() *distributionBuilder {
 	b.configFuncs = append(b.configFuncs, func(d *distribution) {
 		for i, container := range d.containerImages {
 			container.Files = append(container.Files, "linux_config.yaml")
-			container.Files = append(container.Files, "etw_library_license.txt")
+			container.Files = append(container.Files, LicenseFiles()...)
 			d.containerImages[i] = container
 		}
 
@@ -270,12 +277,18 @@ func (b *distributionBuilder) WithDefaultConfigIncluded() *distributionBuilder {
 				Destination: path.Join("/etc", d.name, "config.yaml"),
 				Type:        "config|noreplace",
 			})
+			for _, licenseFile := range LicenseFiles() {
+				nfpm.Contents = append(nfpm.Contents, config.NFPMContent{
+					Source:      licenseFile,
+					Destination: path.Join("/etc", d.name, licenseFile),
+				})
+			}
 			d.nfpms[i] = nfpm
 		}
 
 		for i := range d.msiConfig {
 			d.msiConfig[i].Files = append(d.msiConfig[i].Files, "windows_config.yaml")
-			d.msiConfig[i].Files = append(d.msiConfig[i].Files, "etw_library_license.txt")
+			d.msiConfig[i].Files = append(d.msiConfig[i].Files, LicenseFiles()...)
 		}
 	})
 	return b

@@ -16,6 +16,7 @@ msi:
       - README_windows.md
       - windows_config.yaml
       - etw_library_license.txt
+      - gofalcon_library_license.txt
 builds:
   - id: axoflow-otel-collector-linux
     goos:
@@ -60,6 +61,10 @@ nfpms:
       - src: linux_config.yaml
         dst: /etc/axoflow-otel-collector/config.yaml
         type: config|noreplace
+      - src: etw_library_license.txt
+        dst: /etc/axoflow-otel-collector/etw_library_license.txt
+      - src: gofalcon_library_license.txt
+        dst: /etc/axoflow-otel-collector/gofalcon_library_license.txt
     scripts:
       preinstall: preinstall.sh
       postinstall: postinstall.sh
@@ -89,6 +94,7 @@ dockers:
     extra_files:
       - linux_config.yaml
       - etw_library_license.txt
+      - gofalcon_library_license.txt
     build_flag_templates:
       - --pull
       - --platform=linux/amd64
@@ -108,6 +114,7 @@ dockers:
     extra_files:
       - linux_config.yaml
       - etw_library_license.txt
+      - gofalcon_library_license.txt
     build_flag_templates:
       - --pull
       - --platform=linux/arm64
