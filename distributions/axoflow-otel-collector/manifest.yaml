@@ -59,7 +59,6 @@ providers:
 # When adding a replace, add a comment before it to document why it's needed and when it can be removed
 replaces:
   # Axoflow specific replacements for patched/additional components
-  - github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/countconnector v0.143.0-axoflow.rc1
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.143.0-axoflow.rc1
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/crowdstrikereceiver v0.143.0-axoflow.rc1
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.143.0-axoflow.rc1
