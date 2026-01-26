@@ -45,10 +45,10 @@ podman rm -fv "$container_name" >/dev/null 2>&1 || true
 
 # Create buffer directory for the collector
 # This is needed to avoid the collector from failing to start due to permission issues
-sudo mkdir -p /etc/axoflow-otel-collector/storage && sudo chmod 777 /etc/axoflow-otel-collector/storage
+sudo mkdir -p /var/lib/axoflow-otel-collector/storage && sudo chmod 777 /var/lib/axoflow-otel-collector/storage
 
 # test install
-podman run --name "$container_name" -d -v /etc/axoflow-otel-collector/storage:/etc/axoflow-otel-collector/storage "$image_name"
+podman run --name "$container_name" -d -v /var/lib/axoflow-otel-collector/storage:/var/lib/axoflow-otel-collector/storage "$image_name"
 
 # ensure that the system is up and running by checking if systemctl is running
 $container_exec systemctl is-system-running --quiet --wait
