@@ -36,7 +36,7 @@ exporters:
       storage: file_storage
 ```
 
-Logs are buffered indefinitely in the default storage directory: `/etc/axoflow-otel-collector/storage`. This ensures no logs are lost during outages.
+Logs are buffered indefinitely in the default storage directory: `/var/lib/axoflow-otel-collector/storage`. This ensures no logs are lost during outages.
 
 Add `otlp/axorouter` to the `exporters` section of the configuration file.
 

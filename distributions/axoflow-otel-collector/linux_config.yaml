@@ -22,7 +22,7 @@ exporters:
 
 extensions:
   file_storage:
-    directory: /etc/axoflow-otel-collector/storage
+    directory: /var/lib/axoflow-otel-collector/storage
     create_directory: true
 
 service:
