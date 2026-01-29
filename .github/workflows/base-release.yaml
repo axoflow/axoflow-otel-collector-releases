@@ -13,9 +13,12 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 env:
-  # renovate: datasource=github-tags depName=goreleaser-pro packageName=goreleaser/goreleaser-pro
-  GORELEASER_PRO_VERSION: v2.7.0
+  # renovate: datasource=github-releases packageName=goreleaser/goreleaser-pro
+  GORELEASER_PRO_VERSION: v2.13.3
   GONOSUMDB: github.com/axoflow/*
   GOPRIVATE: github.com/axoflow/*
 
@@ -23,62 +26,62 @@ jobs:
   prepare:
     strategy:
       matrix:
-        GOOS: ${{ fromJSON( inputs.goos) }}
-        GOARCH: ${{ fromJSON( inputs.goarch) }}
-    runs-on: ubuntu-24.04
+        GOOS: ${{ fromJSON(inputs.goos) }}
+        GOARCH: ${{ fromJSON(inputs.goarch) }}
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
-      - uses: sigstore/cosign-installer@c56c2d3e59e4281cc41dea2217323ba5694b171e # v3.8.0
+      - run: ./.github/workflows/scripts/free-disk-space.sh
 
-      - uses: anchore/sbom-action/download-syft@f325610c9f50a54015d37c8d16cb3b0e2c8f4de0 # v0.18.0
+      - uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
+        with:
+          cosign-release: "v2.6.1"
 
-      - uses: docker/setup-qemu-action@4574d27a4764455b42196d70a065bc6853246a25 # v3.4.0
+      - uses: anchore/sbom-action/download-syft@deef08a0db64bfad603422135db61477b16cef56 # v0.22.1
+
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
         with:
           platforms: arm64
 
-      - uses: docker/setup-buildx-action@f7ce87c1d6bead3e36075b2ce75da1f6cc28aaca # v3.9.0
-
-      - uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
-        with:
-          go-version: "~1.24"
-          check-latest: true
-
       - name: Setup wixl # Required to build MSI packages for Windows
-        if: ${{ matrix.GOOS == 'windows' }}
+        if: matrix.GOOS == 'windows'
         run: |
           sudo apt-get update
           sudo apt-get install -y wixl
 
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        with:
+          go-version: "~1.25.0"
+          check-latest: true
+
       - name: Run version update script
+        shell: bash
         run: ./scripts/pre-update-version.sh "${{ github.ref_name }}"
 
-      - name: Setup private module access
+      - name: Setup private module access and generate sources
         env:
-          DEPLOY_KEY_PRIVATE_FOR_AXO_ETW: ${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW}}
+          DEPLOY_KEY_PRIVATE_FOR_AXO_ETW: ${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW }}
+          DISTRIBUTIONS: ${{ inputs.distribution }}
         run: |
           ./scripts/prepare-private-modules-gha.sh
-
-      - name: Generate distribution sources
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: make generate-sources
+          make generate-sources
 
       - name: Login to GitHub Package Registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - shell: bash
-        run: |
-          echo "sha_short=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-      - uses: goreleaser/goreleaser-action@90a3faa9d0182683851fbfa97ca1a2cb983bfca3 # v6.2.1
+      - uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6.4.0
         with:
           distribution: goreleaser-pro
           version: ${{ env.GORELEASER_PRO_VERSION }}
@@ -87,20 +90,24 @@ jobs:
         env:
           GOOS: ${{ matrix.GOOS }}
           GOARCH: ${{ matrix.GOARCH }}
+          GOARM: 7 # Default is 6
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COSIGN_YES: true
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
 
-      - uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: artifacts-${{ inputs.distribution }}-${{ matrix.GOOS }}-${{ matrix.GOARCH }}
           path: distributions/${{ inputs.distribution }}/dist/**/*
           if-no-files-found: error
 
+      - if: always()
+        run: ./.github/workflows/scripts/check-disk-space.sh
+
   release:
-    name: ${{ inputs.distribution }} Release
-    runs-on: ubuntu-24.04
+    name: Release
+    runs-on: ubuntu-latest
     needs: prepare
 
     permissions:
@@ -110,26 +117,29 @@ jobs:
       security-events: write
 
     steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
-      - uses: sigstore/cosign-installer@c56c2d3e59e4281cc41dea2217323ba5694b171e # v3.8.0
+      - uses: sigstore/cosign-installer@faadad0cce49287aee09b3a48701e75088a2c6ad # v4.0.0
+        with:
+          cosign-release: "v2.6.1"
 
-      - uses: anchore/sbom-action/download-syft@f325610c9f50a54015d37c8d16cb3b0e2c8f4de0 # v0.18.0
+      - uses: anchore/sbom-action/download-syft@deef08a0db64bfad603422135db61477b16cef56 # v0.22.1
 
-      - uses: docker/setup-qemu-action@4574d27a4764455b42196d70a065bc6853246a25 # v3.4.0
+      - uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
         with:
           platforms: arm64
 
-      - uses: docker/setup-buildx-action@f7ce87c1d6bead3e36075b2ce75da1f6cc28aaca # v3.9.0
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
-      - uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+      - uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
-          go-version: "~1.24"
+          go-version: "~1.25.0"
           check-latest: true
 
       - name: Google auth
+        if: matrix.GOOS == 'windows'
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: "${{ secrets.WIF_PROVIDER }}"
@@ -137,25 +147,32 @@ jobs:
           token_format: "access_token"
 
       - name: Build Axoflow-signer
+        if: matrix.GOOS == 'windows'
+        shell: bash
         run: ./signer-image/build-signer.sh "${{ github.ref_name }}"
 
-      - uses: actions/download-artifact@fa0a91b85d4f404e444e00e005971372dc801d16 # v4.1.8
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
         with:
-          pattern: artifacts-${{ inputs.distribution }}-*
+          pattern: artifacts-${{ inputs.distribution }}-windows-*
           path: distributions/${{ inputs.distribution }}/dist
           merge-multiple: true
 
-      - name: Display structure of downloaded files
-        run: ls -R distributions/${{ inputs.distribution }}/dist
+      - uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          pattern: artifacts-${{ inputs.distribution }}-linux-*
+          path: distributions/${{ inputs.distribution }}/dist
+          merge-multiple: true
 
       - name: Login to GitHub Package Registry
-        uses: docker/login-action@9780b0c442fbb1117ed29e0efdff1e18412f7567 # v3.3.0
+        uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Google Cloud KMS for Windows MSI code signing
+        if: matrix.GOOS == 'windows'
+        shell: bash
         run: |
           cat > /tmp/kmsp11-config.yaml << EOF
           ---
@@ -171,9 +188,11 @@ jobs:
           echo "GCP_KEY_NAME=${{ secrets.EV_GCP_KEY_NAME }}" >> $GITHUB_ENV
 
       - name: Sign Windows MSI installers
+        if: matrix.GOOS == 'windows'
+        shell: bash
         run: ./scripts/ev-sign.sh "${{ github.ref_name }}"
 
-      - uses: goreleaser/goreleaser-action@90a3faa9d0182683851fbfa97ca1a2cb983bfca3 # v6.2.1
+      - uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6.4.0
         with:
           distribution: goreleaser-pro
           version: ${{ env.GORELEASER_PRO_VERSION }}
@@ -183,29 +202,33 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           COSIGN_YES: true
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+          GORELEASER_CURRENT_TAG: ${{ github.ref_name }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: artifacts-${{ inputs.distribution }}
           path: distributions/${{ inputs.distribution }}/dist/**/*
           if-no-files-found: error
 
       - name: Run Trivy vulnerability scanner
-        uses: aquasecurity/trivy-action@18f2510ee396bbf400402947b394f2dd8c87dbb0 # 0.29.0
+        uses: aquasecurity/trivy-action@b6643a29fecd7f34b3597bc6acb0a98b03d33ff8 # 0.33.1
         with:
           image-ref: ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest
           format: sarif
           output: trivy-results.sarif
 
       - name: Upload Trivy scan results as artifact
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: "[${{ github.job }}] Trivy scan results"
           path: trivy-results.sarif
           retention-days: 5
 
       - name: Upload Trivy scan results to GitHub Security tab
-        uses: github/codeql-action/upload-sarif@9e8d0789d4a0fa9ceb6b1738f7e269594bdd67f0 # v3.28.9
+        uses: github/codeql-action/upload-sarif@3c3833e0f8c1c83d449a7478aa59c036a9165498 # v3.29.11
         with:
           sarif_file: trivy-results.sarif
+
+      - if: always()
+        run: ./.github/workflows/scripts/check-disk-space.sh
