@@ -1,10 +1,12 @@
+# yaml-language-server: $schema=https://goreleaser.com/static/schema-pro.json
 version: 2
 project_name: axoflow-otel-collector-releases
 env:
   - COSIGN_YES=true
   - LD_FLAGS=-s -w
-  - CGO_ENABLED=0
   - BUILD_FLAGS=-trimpath
+  - GOPROXY=https://proxy.golang.org,direct
+  - CGO_ENABLED=0
 release:
   replace_existing_artifacts: true
 msi:
@@ -24,6 +26,8 @@ builds:
     goarch:
       - amd64
       - arm64
+    goarm:
+      - "7"
     dir: _build
     binary: axoflow-otel-collector
     ldflags:
@@ -44,7 +48,7 @@ builds:
       - '{{ .Env.BUILD_FLAGS }}'
 archives:
   - id: axoflow-otel-collector
-    builds:
+    ids:
       - axoflow-otel-collector-linux
       - axoflow-otel-collector-windows
     name_template: '{{ .Binary }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}'
@@ -74,69 +78,18 @@ nfpms:
         dependencies:
           - /bin/sh
     id: axoflow-otel-collector
-    builds:
+    ids:
       - axoflow-otel-collector-linux
     formats:
       - deb
       - rpm
     maintainer: The Axoflow Otel-Collector maintainers <support@axoflow.com>
-    description: OpenTelemetry Collector - axoflow-otel-collector
+    description: Axoflow Otel-Collector Distribution
     license: Apache 2.0
 checksum:
-  name_template: '{{ .ProjectName }}_axoflow-otel-collector_checksums.txt'
-dockers:
-  - goos: linux
-    goarch: amd64
-    dockerfile: Dockerfile
-    image_templates:
-      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-amd64
-      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-amd64
-    extra_files:
-      - linux_config.yaml
-      - etw_library_license.txt
-      - gofalcon_library_license.txt
-    build_flag_templates:
-      - --pull
-      - --platform=linux/amd64
-      - --label=org.opencontainers.image.created={{.Date}}
-      - --label=org.opencontainers.image.name={{.ProjectName}}
-      - --label=org.opencontainers.image.revision={{.FullCommit}}
-      - --label=org.opencontainers.image.version={{.Version}}
-      - --label=org.opencontainers.image.source={{.GitURL}}
-      - --label=org.opencontainers.image.licenses=Apache-2.0
-    use: buildx
-  - goos: linux
-    goarch: arm64
-    dockerfile: Dockerfile
-    image_templates:
-      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-arm64
-      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-arm64
-    extra_files:
-      - linux_config.yaml
-      - etw_library_license.txt
-      - gofalcon_library_license.txt
-    build_flag_templates:
-      - --pull
-      - --platform=linux/arm64
-      - --label=org.opencontainers.image.created={{.Date}}
-      - --label=org.opencontainers.image.name={{.ProjectName}}
-      - --label=org.opencontainers.image.revision={{.FullCommit}}
-      - --label=org.opencontainers.image.version={{.Version}}
-      - --label=org.opencontainers.image.source={{.GitURL}}
-      - --label=org.opencontainers.image.licenses=Apache-2.0
-    use: buildx
-docker_manifests:
-  - name_template: ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}
-    image_templates:
-      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-amd64
-      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-arm64
-  - name_template: ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest
-    image_templates:
-      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-amd64
-      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-arm64
+  name_template: '{{ .ProjectName }}_{{ if eq .Runtime.Goos "windows" }}_{{ .Runtime.Goos }}{{ end }}_checksums.txt'
 signs:
-  - id: linux-cosign
-    cmd: cosign
+  - cmd: cosign
     args:
       - sign-blob
       - --output-signature
@@ -162,3 +115,47 @@ monorepo:
   tag_prefix: v
 partial:
   by: target
+dockers:
+  - goos: linux
+    goarch: amd64
+    dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-amd64
+    extra_files:
+      - linux_config.yaml
+      - etw_library_license.txt
+      - gofalcon_library_license.txt
+    build_flag_templates:
+      - --pull
+      - --platform=linux/amd64
+      - --label=org.opencontainers.image.created={{.Date}}
+      - --label=org.opencontainers.image.name={{.ProjectName}}
+      - --label=org.opencontainers.image.revision={{.FullCommit}}
+      - --label=org.opencontainers.image.version={{.Version}}
+      - --label=org.opencontainers.image.source={{.GitURL}}
+      - --label=org.opencontainers.image.licenses=Apache-2.0
+    use: buildx
+  - goos: linux
+    goarch: arm64
+    dockerfile: Dockerfile
+    image_templates:
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-arm64
+    extra_files:
+      - linux_config.yaml
+      - etw_library_license.txt
+      - gofalcon_library_license.txt
+    build_flag_templates:
+      - --pull
+      - --platform=linux/arm64
+      - --label=org.opencontainers.image.created={{.Date}}
+      - --label=org.opencontainers.image.name={{.ProjectName}}
+      - --label=org.opencontainers.image.revision={{.FullCommit}}
+      - --label=org.opencontainers.image.version={{.Version}}
+      - --label=org.opencontainers.image.source={{.GitURL}}
+      - --label=org.opencontainers.image.licenses=Apache-2.0
+    use: buildx
+docker_manifests:
+  - name_template: ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}
+    image_templates:
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-amd64
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-arm64
