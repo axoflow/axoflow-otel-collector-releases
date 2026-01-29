@@ -1,7 +1,7 @@
 name: Continuous Integration - Axoflow Otel Collector - GoReleaser
 
 on:
-  merge_group: 
+  merge_group:
   push:
     branches: [main]
     paths:
@@ -23,23 +23,26 @@ on:
       - "go.mod"
       - "go.sum"
 
+permissions:
+  contents: read
+
 jobs:
   check-goreleaser:
-    name: Continuous Integration - Axoflow Otel Collector - GoReleaser
+    name: CI - Axoflow Otel Collector - GoReleaser
     uses: ./.github/workflows/base-ci-goreleaser.yaml
     with:
       distribution: axoflow-otel-collector
       goos: '[ "linux", "windows" ]'
-      goarch: '[ "amd64", "arm64"]'
+      goarch: '[ "amd64", "arm64" ]'
     secrets: inherit
 
   package-tests:
-     name: Package tests
-     needs: check-goreleaser
-     uses: ./.github/workflows/base-package-tests.yaml
-     with:
-       distribution: axoflow-otel-collector
-       type: '[ "deb", "rpm" ]'
+    name: Package tests
+    needs: check-goreleaser
+    uses: ./.github/workflows/base-package-tests.yaml
+    with:
+      distribution: axoflow-otel-collector
+      type: '[ "deb", "rpm" ]'
 
   msi-tests:
     name: MSI tests
