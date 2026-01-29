@@ -13,9 +13,12 @@ on:
         required: true
         type: string
 
+permissions:
+  contents: read
+
 env:
-  # renovate: datasource=github-tags depName=goreleaser-pro packageName=goreleaser/goreleaser-pro
-  GORELEASER_PRO_VERSION: v2.7.0
+  # renovate: datasource=github-releases packageName=goreleaser/goreleaser-pro
+  GORELEASER_PRO_VERSION: v2.13.3
   GONOSUMDB: github.com/axoflow/*
   GOPRIVATE: github.com/axoflow/*
 
@@ -25,51 +28,48 @@ jobs:
       matrix:
         GOOS: ${{ fromJSON( inputs.goos) }}
         GOARCH: ${{ fromJSON( inputs.goarch) }}
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@4574d27a4764455b42196d70a065bc6853246a25 # v3.4.0
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
         with:
           platforms: arm64
 
       - name: Setup wixl # Required to build MSI packages for Windows
-        if: ${{ matrix.GOOS == 'windows' }}
+        if: matrix.GOOS == 'windows'
         run: |
           sudo apt-get update
           sudo apt-get install -y wixl
 
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@f7ce87c1d6bead3e36075b2ce75da1f6cc28aaca # v3.9.0
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
       - name: Setup Go
-        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
-          go-version: "~1.24"
+          go-version: "~1.25.0"
           check-latest: true
 
       - name: Run version update script
+        shell: bash
         run: ./scripts/pre-update-version.sh --snapshot
 
-      - name: Setup private module access
+      - name: Setup private module access and generate sources
         env:
-          DEPLOY_KEY_PRIVATE_FOR_AXO_ETW: ${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW}}
+          DEPLOY_KEY_PRIVATE_FOR_AXO_ETW: ${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW }}
+          DISTRIBUTIONS: ${{ inputs.distribution }}
         run: |
           ./scripts/prepare-private-modules-gha.sh
-
-      - name: Generate the sources for ${{ inputs.distribution }}
-        env:
-          DISTRIBUTIONS: ${{ inputs.distribution }}
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
-        run: make generate-sources
+          make generate-sources
 
       - name: Run GoReleaser for ${{ inputs.distribution }}
-        uses: goreleaser/goreleaser-action@90a3faa9d0182683851fbfa97ca1a2cb983bfca3 # v6.2.1
+        uses: goreleaser/goreleaser-action@e435ccd777264be153ace6237001ef4d979d3a7a # v6.4.0
         with:
           distribution: goreleaser-pro
           version: ${{ env.GORELEASER_PRO_VERSION }}
@@ -78,20 +78,22 @@ jobs:
         env:
           GOOS: ${{ matrix.GOOS }}
           GOARCH: ${{ matrix.GOARCH }}
+          GOARM: "7" # Default is 6
           GOAMD64: v1
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
 
       - name: Print built artifacts
         run: cat ./distributions/${{ inputs.distribution }}/dist/**/artifacts.json
 
+      - name: Print metadata
+        run: cat ./distributions/${{ inputs.distribution }}/dist/**/metadata.json
+
       - name: Print dist folder contents
-        if: always()
         run: ls -laR ./distributions/${{ inputs.distribution }}/dist
 
       - name: Upload linux service packages
         if: ${{ matrix.GOOS == 'linux' && matrix.GOARCH == 'amd64' }}
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: linux-packages
           path: distributions/${{ inputs.distribution }}/dist/linux_amd64_v1/*
@@ -99,8 +101,11 @@ jobs:
 
       - name: Upload MSI packages
         if: ${{ matrix.GOOS == 'windows' && matrix.GOARCH == 'amd64' }}
-        uses: actions/upload-artifact@65c4c4a1ddee5b72f698fdd19549f0f0fb45cf08 # v4.6.0
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
         with:
           name: msi-packages
           path: distributions/${{ inputs.distribution }}/dist/windows_amd64_v1/**/*.msi
           if-no-files-found: error
+
+      - if: always()
+        run: ./.github/workflows/scripts/check-disk-space.sh

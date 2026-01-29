@@ -1,4 +1,4 @@
-name: Continuous Integration
+name: CI - Collector Binaries
 
 on:
   merge_group:
@@ -11,20 +11,23 @@ env:
   GONOSUMDB: github.com/axoflow/*
   GOPRIVATE: github.com/axoflow/*
 
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Build
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           fetch-depth: 0
 
       - name: Setup Go
-        uses: actions/setup-go@f111f3307d8850f501ac008e886eec1fd1932a34 # v5.3.0
+        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
         with:
-          go-version: "~1.24"
+          go-version: "~1.25.0"
           check-latest: true
 
       - name: Tidy go.mod files
@@ -33,10 +36,7 @@ jobs:
       - name: Setup private module access
         env:
           DEPLOY_KEY_PRIVATE_FOR_AXO_ETW: ${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW}}
-        run: |
-          ./scripts/prepare-private-modules-gha.sh
+        run: ./scripts/prepare-private-modules-gha.sh
 
       - name: Verify
-        env:
-          SSH_AUTH_SOCK: /tmp/ssh_agent.sock
         run: make ci
