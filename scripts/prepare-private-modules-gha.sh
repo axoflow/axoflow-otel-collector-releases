@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
-# Setup SSH based git operations for GitHub Actions
-git config --global url."git@github.com:".insteadOf "https://github.com/"
-
-# Setup Deploy Key for private repository access
-
 export SSH_AUTH_SOCK="/tmp/ssh_agent.sock"
+ssh-agent -a "${SSH_AUTH_SOCK}" > /dev/null
+ssh-add - <<< "${DEPLOY_KEY_PRIVATE_FOR_AXO_ETW}"
 
-ssh-agent -a ${SSH_AUTH_SOCK} >/dev/null
-ssh-add - <<<"${DEPLOY_KEY_PRIVATE_FOR_AXO_ETW}"
+mkdir -p ~/.ssh
+ssh-keyscan github.com >> ~/.ssh/known_hosts 2>/dev/null
+
+git config --global url."git@github.com:axoflow/axo-etw.git".insteadOf "https://github.com/axoflow/axo-etw"
+
+echo "SSH_AUTH_SOCK=${SSH_AUTH_SOCK}" >> "$GITHUB_ENV"
