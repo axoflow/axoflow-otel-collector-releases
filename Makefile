@@ -8,7 +8,7 @@ OTELCOL_BUILDER ?= ${OTELCOL_BUILDER_DIR}/ocb
 DISTRIBUTIONS ?= "axoflow-otel-collector"
 
 ci: check build
-check: ensure-goreleaser-up-to-date
+check: ensure-goreleaser-up-to-date validate-components
 
 build: go ocb
 	@./scripts/build.sh -d "${DISTRIBUTIONS}" -b ${OTELCOL_BUILDER}
@@ -31,6 +31,9 @@ goreleaser-verify: goreleaser
 
 ensure-goreleaser-up-to-date: generate-goreleaser
 	@git diff -s --exit-code distributions/*/.goreleaser.yaml || (echo "Check failed: The goreleaser templates have changed but the .goreleaser.yamls haven't. Run 'make generate-goreleaser' and update your PR." && exit 1)
+
+validate-components:
+	@./scripts/validate-components.sh
 
 .PHONY: ocb
 ocb:
