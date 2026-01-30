@@ -3,7 +3,7 @@
       Name="Axoflow OpenTelemetry Collector"
       Id="*"
       UpgradeCode="BBD75D8E-8F77-440A-B780-4F30C3E099B6"
-      Version="{{ .Version }}"
+      Version="{{ if .IsSnapshot }}{{ .RawVersion }}{{ else }}{{ .Version }}{{ end }}"
       Manufacturer="Axoflow Inc."
       Language="1033">
       
@@ -51,7 +51,7 @@
                   <Component Id="ApplicationComponent" Guid="A4EC99AE-4DBA-4C66-81C5-6434236CC031">
                      <!-- Files to include -->
                      <File
-                        Id="{{ .Binary }}.exe"
+                        Id="{{ replace .Binary "-"  "_"}}.exe"
                         Name="{{ .Binary }}.exe"
                         Source="{{ .Binary }}.exe"
                         KeyPath="yes"/>
@@ -63,6 +63,10 @@
                         Id="etw_library_license.txt"
                         Name="etw_library_license.txt"
                         Source="etw_library_license.txt"/>
+                     <File
+                        Id="gofalcon_library_license.txt"
+                        Name="gofalcon_library_license.txt"
+                        Source="gofalcon_library_license.txt"/>
                      <File
                         Id="default_config.yaml"
                         Name="default_config.yaml"
