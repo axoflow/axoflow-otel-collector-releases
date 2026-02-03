@@ -1,3 +1,6 @@
+# This script is currently unused, however it may be useful in the future
+# if opt to adopt window native artifact building.
+
 $keyPath = "$env:RUNNER_TEMP\deploy_key"
 
 $key = ($env:DEPLOY_KEY_PRIVATE_FOR_AXO_ETW -replace "`r", "").Trim() + "`n"
