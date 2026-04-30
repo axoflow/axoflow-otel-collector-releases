@@ -68,3 +68,4 @@ replaces:
   # Vulnerability patches
   - go.opentelemetry.io/otel/sdk => go.opentelemetry.io/otel/sdk v1.40.0
   - google.golang.org/grpc => google.golang.org/grpc v1.79.3
+  - github.com/antchfx/xpath => github.com/antchfx/xpath v1.3.6
