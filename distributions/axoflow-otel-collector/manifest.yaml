@@ -67,3 +67,4 @@ replaces:
   - github.com/opentelemetry/opentelemetry-collector-contrib/pkg/stanza => github.com/axoflow/opentelemetry-collector-contrib/pkg/stanza v0.143.0-axoflow.3
   # Vulnerability patches
   - go.opentelemetry.io/otel/sdk => go.opentelemetry.io/otel/sdk v1.40.0
+  - google.golang.org/grpc => google.golang.org/grpc v1.79.3
