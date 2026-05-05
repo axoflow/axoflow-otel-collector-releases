@@ -1,19 +1,19 @@
 receivers:
-  windowseventlog/application:
+  windows_event_log/application:
     channel: application
     raw: true
     retry_on_failure:
       enabled: true
       max_elapsed_time: 0
     storage: file_storage
-  windowseventlog/system:
+  windows_event_log/system:
     channel: system
     raw: true
     retry_on_failure:
       enabled: true
       max_elapsed_time: 0
     storage: file_storage
-  windowseventlog/security:
+  windows_event_log/security:
     channel: security
     raw: true
     retry_on_failure:
@@ -122,7 +122,7 @@ service:
         receivers: [nop]
         exporters: [nop]
     # logs/eventlog:
-    #   receivers: [windowseventlog/application, windowseventlog/system, windowseventlog/security]
+    #   receivers: [windows_event_log/application, windows_event_log/system, windows_event_log/security]
     #   processors: [resource/agent, resourcedetection/system]
     #   exporters: [otlp/axorouter]
     # logs/dns:

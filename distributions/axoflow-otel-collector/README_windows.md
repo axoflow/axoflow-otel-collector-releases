@@ -50,7 +50,7 @@ The default configuration collects from the following channels: `application`, `
 
 ```yaml
 receivers:
-  windowseventlog/<CHANNEL_NAME>:
+  windows_event_log/<CHANNEL_NAME>:
     channel: <CHANNEL_NAME>
     raw: true
 ```
