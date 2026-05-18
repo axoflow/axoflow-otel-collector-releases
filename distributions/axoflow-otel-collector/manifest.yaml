@@ -7,48 +7,48 @@ dist:
 
 extensions:
   - gomod: go.opentelemetry.io/collector/extension/zpagesextension v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/bearertokenauthextension v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/healthcheckextension v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/pprofextension v0.152.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/bearertokenauthextension v0.152.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/basicauthextension v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/extension/storage/filestorage v0.152.0
 
 exporters:
   - gomod: go.opentelemetry.io/collector/exporter/debugexporter v0.152.0
+  - gomod: go.opentelemetry.io/collector/exporter/nopexporter v0.152.0
   - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.152.0
   - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.152.0
-  - gomod: go.opentelemetry.io/collector/exporter/nopexporter v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusexporter v0.152.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/elasticsearchexporter v0.152.0
   - gomod: github.com/axoflow/fluentforwardexporter v0.152.0-axoflow.1
 
 processors:
   - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.152.0
   - gomod: go.opentelemetry.io/collector/processor/memorylimiterprocessor v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/attributesprocessor v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/deltatocumulativeprocessor v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/filterprocessor v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/k8sattributesprocessor v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourceprocessor v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/transformprocessor v0.152.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/deltatocumulativeprocessor v0.152.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/processor/resourcedetectionprocessor v0.152.0
 
 receivers:
   - gomod: go.opentelemetry.io/collector/receiver/nopreceiver v0.152.0
   - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.152.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.152.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/azureeventhubreceiver v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awscloudwatchreceiver v0.152.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowseventlogreceiver v0.152.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver v0.152.0
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kafkareceiver v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/azureeventhubreceiver v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/journaldreceiver v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kafkareceiver v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowseventlogreceiver v0.152.0
 
 connectors:
-  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/connector/countconnector v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/connector/routingconnector v0.152.0
 
 providers:
