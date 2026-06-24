@@ -42,6 +42,7 @@ receivers:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/azureeventhubreceiver v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver v0.152.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/filelogreceiver v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/journaldreceiver v0.152.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kafkareceiver v0.152.0
@@ -65,6 +66,7 @@ replaces:
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.152.0-axoflow.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/crowdstrikereceiver v0.152.0-axoflow.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.152.0-axoflow.0
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver v0.152.0-axoflow.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/pkg/stanza => github.com/axoflow/opentelemetry-collector-contrib/pkg/stanza v0.152.0-axoflow.0
   # Vulnerability patches
   - github.com/prometheus/prometheus => github.com/prometheus/prometheus v0.311.3
