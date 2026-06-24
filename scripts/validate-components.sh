@@ -20,6 +20,7 @@ EXCEPTION_COMPONENTS=(
   "github.com/axoflow/fluentforwardexporter"
   "github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector"
   "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver"
+  "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver"
   "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver"
 )
 
