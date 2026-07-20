@@ -83,6 +83,8 @@ nfpms:
       rpm:
         dependencies:
           - /bin/sh
+        scripts:
+          postinstall: postinstall-rpm.sh
     id: axoflow-otel-collector
     ids:
       - axoflow-otel-collector-linux
