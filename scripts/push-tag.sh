@@ -8,6 +8,8 @@
 
 set -euo pipefail
 
+cd "$(dirname "$0")/.."
+
 if ! command -v yq &> /dev/null; then
     echo "This script requires 'yq'. Please install and try again."
     exit 1
@@ -27,9 +29,11 @@ VALIDATE="${VALIDATE:-true}"
 VERSION="${TAG#v}"
 
 if [ "${VALIDATE}" = "true" ]; then
+    checked=0
     for dir in distributions/*/; do
         manifest="${dir}manifest.yaml"
         if [ -f "${manifest}" ]; then
+            checked=$((checked + 1))
             dist_version=$(yq '.dist.version' "${manifest}")
             if [ "${dist_version}" != "${VERSION}" ]; then
                 echo "Version mismatch in ${manifest}: dist.version is set to '${dist_version}', expected '${VERSION}'"
@@ -39,6 +43,10 @@ if [ "${VALIDATE}" = "true" ]; then
             fi
         fi
     done
+    if [ "${checked}" -eq 0 ]; then
+        echo "No manifest found to validate — refusing to tag."
+        exit 1
+    fi
 fi
 
 echo "Adding tag ${TAG}"
