@@ -129,6 +129,7 @@ dockers:
     dockerfile: Dockerfile
     image_templates:
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-amd64
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-amd64
     extra_files:
       - linux_config.yaml
       - etw_library_license.txt
@@ -148,6 +149,7 @@ dockers:
     dockerfile: Dockerfile
     image_templates:
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-arm64
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-arm64
     extra_files:
       - linux_config.yaml
       - etw_library_license.txt
@@ -167,3 +169,7 @@ docker_manifests:
     image_templates:
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-amd64
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-arm64
+  - name_template: ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest
+    image_templates:
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-amd64
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-arm64
