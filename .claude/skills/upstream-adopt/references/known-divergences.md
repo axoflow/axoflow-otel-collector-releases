@@ -35,3 +35,31 @@ rejects something.
 ## Permanently rejected upstream changes
 
 (append `- <upstream path or commit> — <reason>` entries here during runs)
+
+- `cmd/msi-generator/` (fec0c8f) — techdebt: templating our single deeply-customized
+  windows-installer.wxs (branding, config persistence, DISABLE_AUTOSTART) is pure cost.
+- Snapshot version template `-next` (b2a4951 lineage) — our snapshot pipeline
+  (pre-update-version.sh, package-test `*-SNAPSHOT-*` globs) keys on goreleaser's default
+  `-SNAPSHOT-` naming.
+- Nightly release channel (756b394, 5504f17): withNightlyConfig, nightly workflows/inputs,
+  create-issue-on-failure, `package-test.yaml` cron — not-needed.
+- `.github/workflows/update-version.yaml` + `bump-versions.sh` — not-needed: otelbot/multi-
+  manifest release-prep automation; `-axoflow.N` suffix breaks its semver regex.
+- `renovate.json` — not-needed: Renovate app not enabled on the repo.
+- prev-tag / generated release-notes plumbing (`--release-header-tmpl`, release-template.md)
+  — not-needed: no changelog process.
+- OBI/eBPF instrumentation (3ac8983): prepare-obi.sh, fetch-obi action, obi component —
+  not-needed for a log-pipeline distro; revisit only on customer demand.
+- Expanded arch matrix (386/arm/ppc64le/s390x/riscv64/darwin), GOPPC64 — deliberate
+  amd64+arm64-only matrix.
+- docker.io publish, otel self-hosted runners (`otel-windows-latest-8-cores`) — org-specific.
+- chloggen/changelog machinery, `.github/lychee.toml`, `internal/tools/`, root
+  `.goreleaser.yaml`, `docs/release.md`, `distributions/README.md` — upstream community
+  process files.
+- `tests/msi/{go.mod,go.sum,msi_test.go}` — ours is ahead (vuln fixes, Axoflow install-path
+  assertions); never sync from upstream.
+
+## Deferred (re-raise on future runs)
+
+- Windows-native builds/tests (ad76050, 4b8d649): windows-2022 runners, native Win container
+  builds — tangled with our linux wixl+EV-sign MSI flow; user deferred 2026-07-20.
