@@ -3,9 +3,9 @@ name: CI - Collector Binaries
 on:
   merge_group:
   push:
-    branches: [main]
+    branches: [main, release/*]
   pull_request:
-    branches: [main]
+    branches: [main, release/*]
 
 env:
   GONOSUMDB: github.com/axoflow/*
@@ -20,14 +20,14 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           fetch-depth: 0
 
       - name: Setup Go
-        uses: actions/setup-go@7a3fe6cf4cb3a834922a1244abfce67bcef6a0c5 # v6.2.0
+        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
         with:
-          go-version: "~1.25.0"
+          go-version: "~1.26.0"
           check-latest: true
 
       - name: Tidy go.mod files
