@@ -9,7 +9,7 @@ OTELCOL_BUILDER ?= ${OTELCOL_BUILDER_DIR}/ocb
 DISTRIBUTIONS ?= "axoflow-otel-collector"
 
 ci: check build
-check: ensure-goreleaser-up-to-date validate-components
+check: ensure-goreleaser-up-to-date validate-components validate-version-consistency
 
 build: go ocb
 	@./scripts/build.sh -d "${DISTRIBUTIONS}" -b ${OTELCOL_BUILDER}
@@ -35,6 +35,9 @@ ensure-goreleaser-up-to-date: generate-goreleaser
 
 validate-components:
 	@./scripts/validate-components.sh
+
+validate-version-consistency:
+	@./scripts/validate-version-consistency.sh
 
 .PHONY: ocb
 ocb:
