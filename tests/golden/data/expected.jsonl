@@ -1,0 +1,3 @@
+{"attributes":[{"key":"log.file.name","value":{"stringValue":"input.log"}}],"body":{"stringValue":"hello from axoflow golden test line 1"}}
+{"attributes":[{"key":"log.file.name","value":{"stringValue":"input.log"}}],"body":{"stringValue":"hello from axoflow golden test line 2"}}
+{"attributes":[{"key":"log.file.name","value":{"stringValue":"input.log"}}],"body":{"stringValue":"hello from axoflow golden test line 3"}}

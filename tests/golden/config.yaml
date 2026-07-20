@@ -1,0 +1,31 @@
+receivers:
+  filelog:
+    include:
+      - /var/data/input.log
+    start_at: beginning
+
+processors:
+  # Zero out timestamps so the golden comparison is fully deterministic
+  transform:
+    log_statements:
+      - context: log
+        statements:
+          - set(time_unix_nano, 0)
+          - set(observed_time_unix_nano, 0)
+
+exporters:
+  debug:
+    verbosity: detailed
+  file:
+    path: /var/data/output.json
+
+service:
+  pipelines:
+    logs:
+      receivers:
+        - filelog
+      processors:
+        - transform
+      exporters:
+        - file
+        - debug

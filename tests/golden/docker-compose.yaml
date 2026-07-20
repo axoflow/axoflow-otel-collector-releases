@@ -1,0 +1,11 @@
+services:
+  collector:
+    container_name: golden-collector
+    image: ${IMG}
+    user: ${MY_UID}:${MY_GID}
+    volumes:
+      - ./config.yaml:/etc/config.yaml:ro
+      - ./data:/var/data
+    command:
+      - --config
+      - /etc/config.yaml
