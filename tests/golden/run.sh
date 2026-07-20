@@ -40,9 +40,18 @@ trap cleanup EXIT
 rm -f data/output.json
 MY_UID="$(id -u)" MY_GID="$(id -g)" docker compose up -d
 
+count_records() {
+    # jq may emit a count and still exit non-zero on a partially-written
+    # trailing line; take the last complete value and force it numeric
+    local n
+    n="$(jq -s '[.[].resourceLogs[].scopeLogs[].logRecords[]] | length' data/output.json 2>/dev/null | tail -n1 || true)"
+    [[ "$n" =~ ^[0-9]+$ ]] || n=0
+    echo "$n"
+}
+
 echo "Waiting for $EXPECTED_LINES log records ..."
 for _ in $(seq 1 30); do
-    count="$(jq -s '[.[].resourceLogs[].scopeLogs[].logRecords[]] | length' data/output.json 2>/dev/null || echo 0)"
+    count="$(count_records)"
     [ "$count" -ge "$EXPECTED_LINES" ] && break
     sleep 2
 done
