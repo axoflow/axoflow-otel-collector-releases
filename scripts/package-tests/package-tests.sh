@@ -72,12 +72,8 @@ add_trap_func podman_logs
 podman build -t "$image_name" -f "$SCRIPT_DIR/Dockerfile.test.$pkg_type" "$SCRIPT_DIR"
 podman rm -fv "$container_name" >/dev/null 2>&1 || true
 
-# Create buffer directory for the collector
-# This is needed to avoid the collector from failing to start due to permission issues
-sudo mkdir -p /var/lib/axoflow-otel-collector/storage && sudo chmod 777 /var/lib/axoflow-otel-collector/storage
-
 # test install
-podman run --name "$container_name" -d -v /var/lib/axoflow-otel-collector/storage:/var/lib/axoflow-otel-collector/storage "$image_name"
+podman run --name "$container_name" -d "$image_name"
 
 # ensure that the system is up and running by checking if systemctl is running
 # TODO(MovieStoreGuy): re-enable when we have a way validate that systemd is fully running
