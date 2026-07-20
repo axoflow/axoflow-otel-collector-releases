@@ -93,6 +93,29 @@ jobs:
       - name: Print dist folder contents
         run: ls -laR ./distributions/${{ inputs.distribution }}/dist
 
+      - name: Smoke test container image
+        if: ${{ matrix.GOOS == 'linux' && matrix.GOARCH == 'amd64' }}
+        run: |
+          docker run --name ${{ inputs.distribution }} \
+            -d \
+            -v ${PWD}/tests/docker-tests/default-config.yaml:/config.yaml \
+            ghcr.io/axoflow/${{ inputs.distribution }}/${{ inputs.distribution }}:latest-amd64 \
+            --config /config.yaml
+          sleep 10
+          docker logs ${{ inputs.distribution }} &>docker-logs-${{ inputs.distribution }}.log
+          if grep "Everything is ready." docker-logs-${{ inputs.distribution }}.log; then
+            echo "${{ inputs.distribution }} started up correctly"
+          else
+            echo "${{ inputs.distribution }} failed to start"
+            cat docker-logs-${{ inputs.distribution }}.log
+            exit 1
+          fi
+          docker rm -f ${{ inputs.distribution }}
+
+      - name: Run golden test
+        if: ${{ matrix.GOOS == 'linux' && matrix.GOARCH == 'amd64' }}
+        run: make golden-test IMG=ghcr.io/axoflow/${{ inputs.distribution }}/${{ inputs.distribution }}:latest-amd64
+
       - name: Upload linux service packages
         if: ${{ matrix.GOOS == 'linux' && matrix.GOARCH == 'amd64' }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

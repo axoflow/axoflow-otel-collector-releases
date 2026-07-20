@@ -58,6 +58,14 @@ rejects something.
   process files.
 - `tests/msi/{go.mod,go.sum,msi_test.go}` — ours is ahead (vuln fixes, Axoflow install-path
   assertions); never sync from upstream.
+- Two-phase `--generate-build-step` build config (9b51357) — our release already splits via
+  goreleaser-pro `--split`/`continue --merge` around EV signing; upstream's extra build stage
+  exists for OBI/Windows-native needs we don't have. Remnants stay commented out.
+- Telemetry prometheus reader defaults (`without_units/type_suffix/scope_info`, 127.0.0.1) —
+  would rename self-metrics on :8888 and break dashboards; ours stays `level: basic`.
+- `tests/golden/` upstream harness (cmd/golden + self-metrics scrape) — replaced by our own
+  log-pipeline golden (filelog → jq canonical diff); upstream's golden tool is metrics-only
+  and our manifest has no prometheus receiver. Never sync tests/golden from upstream.
 
 ## Deferred (re-raise on future runs)
 

@@ -39,6 +39,14 @@ validate-components:
 validate-version-consistency:
 	@./scripts/validate-version-consistency.sh
 
+IMG ?= ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-amd64
+.PHONY: golden-test golden-record
+golden-test:
+	@IMG=${IMG} ./tests/golden/run.sh
+
+golden-record:
+	@IMG=${IMG} ./tests/golden/run.sh --record
+
 .PHONY: ocb
 ocb:
 ifeq (, $(shell command -v ocb 2>/dev/null))
