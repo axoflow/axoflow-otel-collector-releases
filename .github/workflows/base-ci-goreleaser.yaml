@@ -65,7 +65,7 @@ jobs:
           DEPLOY_KEY_PRIVATE_FOR_AXO_ETW: ${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW }}
           DISTRIBUTIONS: ${{ inputs.distribution }}
         run: |
-          ./scripts/prepare-private-modules-gha.sh
+          source ./scripts/prepare-private-modules-gha.sh
           make generate-sources
 
       - name: Run GoReleaser for ${{ inputs.distribution }}
