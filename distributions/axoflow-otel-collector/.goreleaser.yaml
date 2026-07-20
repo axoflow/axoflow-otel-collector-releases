@@ -69,6 +69,12 @@ nfpms:
         dst: /etc/axoflow-otel-collector/etw_library_license.txt
       - src: gofalcon_library_license.txt
         dst: /etc/axoflow-otel-collector/gofalcon_library_license.txt
+      - dst: /var/lib/axoflow-otel-collector
+        type: dir
+        file_info:
+          owner: axoflow-otel-collector
+          group: axoflow-otel-collector
+          mode: 488
     scripts:
       preinstall: preinstall.sh
       postinstall: postinstall.sh
