@@ -66,13 +66,15 @@ jobs:
         shell: bash
         run: ./scripts/pre-update-version.sh "${{ github.ref_name }}"
 
-      - name: Setup private module access and generate sources
+      - name: Setup private module access
         env:
           DEPLOY_KEY_PRIVATE_FOR_AXO_ETW: ${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW }}
+        run: ./scripts/prepare-private-modules-gha.sh
+
+      - name: Generate sources for ${{ inputs.distribution }}
+        env:
           DISTRIBUTIONS: ${{ inputs.distribution }}
-        run: |
-          ./scripts/prepare-private-modules-gha.sh
-          make generate-sources
+        run: make generate-sources # inherits SSH_AUTH_SOCK from the previous step via $GITHUB_ENV
 
       - name: Login to GitHub Package Registry
         uses: docker/login-action@5e57cd118135c172c3672efd75eb46360885c0ef # v3.6.0
