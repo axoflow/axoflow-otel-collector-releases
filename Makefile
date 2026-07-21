@@ -1,14 +1,15 @@
 GO ?= go
 GORELEASER ?= goreleaser
 
-OTELCOL_BUILDER_VERSION ?= 0.143.0
+# renovate: datasource=github-releases depName=OCB packageName=open-telemetry/opentelemetry-collector
+OTELCOL_BUILDER_VERSION ?= 0.156.0
 OTELCOL_BUILDER_DIR ?= ${HOME}/bin
 OTELCOL_BUILDER ?= ${OTELCOL_BUILDER_DIR}/ocb
 
 DISTRIBUTIONS ?= "axoflow-otel-collector"
 
 ci: check build
-check: ensure-goreleaser-up-to-date validate-components
+check: ensure-goreleaser-up-to-date validate-components validate-version-consistency
 
 build: go ocb
 	@./scripts/build.sh -d "${DISTRIBUTIONS}" -b ${OTELCOL_BUILDER}
@@ -34,6 +35,17 @@ ensure-goreleaser-up-to-date: generate-goreleaser
 
 validate-components:
 	@./scripts/validate-components.sh
+
+validate-version-consistency:
+	@./scripts/validate-version-consistency.sh
+
+IMG ?= ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-amd64
+.PHONY: golden-test golden-record
+golden-test:
+	@IMG=${IMG} ./tests/golden/run.sh
+
+golden-record:
+	@IMG=${IMG} ./tests/golden/run.sh --record
 
 .PHONY: ocb
 ocb:
@@ -76,8 +88,4 @@ goreleaser:
 REMOTE?=git@github.com:axoflow/axoflow-otel-collector-releases.git
 .PHONY: push-tags
 push-tags:
-	@[ "${TAG}" ] || ( echo ">> env var TAG is not set"; exit 1 )
-	@echo "Adding tag ${TAG}"
-	@git tag -a ${TAG} -s -m "Version ${TAG}"
-	@echo "Pushing tag ${TAG}"
-	@git push ${REMOTE} ${TAG}
+	@REMOTE=${REMOTE} TAG=${TAG} ./scripts/push-tag.sh

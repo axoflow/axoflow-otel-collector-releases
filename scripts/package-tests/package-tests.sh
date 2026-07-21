@@ -72,18 +72,31 @@ add_trap_func podman_logs
 podman build -t "$image_name" -f "$SCRIPT_DIR/Dockerfile.test.$pkg_type" "$SCRIPT_DIR"
 podman rm -fv "$container_name" >/dev/null 2>&1 || true
 
-# Create buffer directory for the collector
-# This is needed to avoid the collector from failing to start due to permission issues
-sudo mkdir -p /var/lib/axoflow-otel-collector/storage && sudo chmod 777 /var/lib/axoflow-otel-collector/storage
-
 # test install
-podman run --name "$container_name" -d -v /var/lib/axoflow-otel-collector/storage:/var/lib/axoflow-otel-collector/storage "$image_name"
+podman run --name "$container_name" -d "$image_name"
 
 # ensure that the system is up and running by checking if systemctl is running
 # TODO(MovieStoreGuy): re-enable when we have a way validate that systemd is fully running
 # $container_exec systemctl is-system-running --wait --quiet
 
 install_pkg "$container_name" "$PKG_PATH"
+
+if [[ "$pkg_type" == "rpm" ]]; then
+    echo "Checking $SERVICE_NAME service state after install ..."
+    if $container_exec systemctl is-active "$SERVICE_NAME"; then
+        echo "$SERVICE_NAME service running after rpm install" >&2
+        exit 1
+    fi
+    echo "$SERVICE_NAME service correctly not running after rpm install"
+
+    if $container_exec systemctl is-enabled "$SERVICE_NAME"; then
+        echo "$SERVICE_NAME service enabled after rpm install" >&2
+        exit 1
+    fi
+    echo "$SERVICE_NAME service correctly not enabled after rpm install"
+
+    $container_exec systemctl start "$SERVICE_NAME"
+fi
 
 # If we got to this point, we might need to check the logs of the systemd service
 # when it's not properly active. This is added as a trap because the check

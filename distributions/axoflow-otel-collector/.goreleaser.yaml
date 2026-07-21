@@ -69,6 +69,12 @@ nfpms:
         dst: /etc/axoflow-otel-collector/etw_library_license.txt
       - src: gofalcon_library_license.txt
         dst: /etc/axoflow-otel-collector/gofalcon_library_license.txt
+      - dst: /var/lib/axoflow-otel-collector
+        type: dir
+        file_info:
+          owner: axoflow-otel-collector
+          group: axoflow-otel-collector
+          mode: 488
     scripts:
       preinstall: preinstall.sh
       postinstall: postinstall.sh
@@ -77,6 +83,8 @@ nfpms:
       rpm:
         dependencies:
           - /bin/sh
+        scripts:
+          postinstall: postinstall-rpm.sh
     id: axoflow-otel-collector
     ids:
       - axoflow-otel-collector-linux
@@ -121,6 +129,7 @@ dockers:
     dockerfile: Dockerfile
     image_templates:
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-amd64
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-amd64
     extra_files:
       - linux_config.yaml
       - etw_library_license.txt
@@ -140,6 +149,7 @@ dockers:
     dockerfile: Dockerfile
     image_templates:
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-arm64
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-arm64
     extra_files:
       - linux_config.yaml
       - etw_library_license.txt
@@ -159,3 +169,7 @@ docker_manifests:
     image_templates:
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-amd64
       - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:{{ .Version }}-arm64
+  - name_template: ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest
+    image_templates:
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-amd64
+      - ghcr.io/axoflow/axoflow-otel-collector/axoflow-otel-collector:latest-arm64

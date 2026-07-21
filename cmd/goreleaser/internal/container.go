@@ -74,7 +74,7 @@ func newContainerImages(dist string, targetOS string, targetArchs []string, opts
 
 // newContainerImageManifests creates container image manifest configurations.
 func newContainerImageManifests(dist, os string, archs []string, opts containerImageOptions) []config.DockerManifest {
-	tags := []string{`{{ .Version }}`}
+	tags := []string{`{{ .Version }}`, "latest"}
 	if os == "windows" {
 		for i, tag := range tags {
 			tags[i] = fmt.Sprintf("%s-%s-%s", tag, os, opts.winVersion)
@@ -97,6 +97,7 @@ func buildDockerImageWithOS(dist, os, arch string, opts containerImageOptions) c
 		imageTemplates = append(
 			imageTemplates,
 			fmt.Sprintf("%s/%s:{{ .Version }}-%s", prefix, imageName(dist, opts), osArch.imageTag()),
+			fmt.Sprintf("%s/%s:latest-%s", prefix, imageName(dist, opts), osArch.imageTag()),
 		)
 	}
 
