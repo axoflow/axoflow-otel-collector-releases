@@ -71,4 +71,5 @@ replaces:
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.156.0-axoflow.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver v0.156.0-axoflow.0
   # Vulnerability patches
-  # (cleared for v0.156.0 — repopulate from the fresh CVE/trivy scan results in a separate `fix: vulnerabilities` commit)
+  # GHSA-hrxh-6v49-42gf
+  - google.golang.org/grpc => google.golang.org/grpc v1.82.1
