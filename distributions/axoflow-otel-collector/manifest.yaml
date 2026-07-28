@@ -39,6 +39,7 @@ receivers:
   - gomod: go.opentelemetry.io/collector/receiver/nopreceiver v0.156.0
   - gomod: go.opentelemetry.io/collector/receiver/otlpreceiver v0.156.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awscloudwatchreceiver v0.156.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/awss3receiver v0.156.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/azureeventhubreceiver v0.156.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver v0.156.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver v0.156.0
