@@ -78,3 +78,5 @@ replaces:
   # Vulnerability patches
   # GHSA-hrxh-6v49-42gf
   - google.golang.org/grpc => google.golang.org/grpc v1.82.1
+  # GO-2026-5970 / CVE-2026-56852: norm.Iter infinite loop on invalid UTF-8. Remove once deps pull in >= v0.39.0.
+  - golang.org/x/text => golang.org/x/text v0.39.0
