@@ -22,6 +22,8 @@ EXCEPTION_COMPONENTS=(
   "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver"
   "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver"
   "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver"
+  "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/idirareceiver"
+  "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/tenableauditlogreceiver"
 )
 
 # Ensure required tools are available
