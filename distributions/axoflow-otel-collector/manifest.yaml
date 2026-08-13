@@ -52,6 +52,7 @@ receivers:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/journaldreceiver v0.156.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/k8seventsreceiver v0.156.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/kafkareceiver v0.156.0
+  - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlqueryreceiver v0.156.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/tenableauditlogreceiver v0.156.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowseventlogreceiver v0.156.0
 
@@ -71,7 +72,7 @@ providers:
 replaces:
   # Axoflow specific replacements for patched/additional components
   - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.156.0-axoflow.0
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/crowdstrikereceiver v0.156.0-axoflow.0
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/crowdstrikereceiver v0.156.0-axoflow.1
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.156.0-axoflow.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver v0.156.0-axoflow.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/idirareceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/idirareceiver v0.156.0-axoflow.0
