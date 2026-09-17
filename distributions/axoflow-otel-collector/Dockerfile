@@ -10,6 +10,7 @@ USER ${USER_UID}:${USER_GID}
 COPY --from=certs /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
 COPY --chmod=755 axoflow-otel-collector /axoflow-otel-collector
 COPY linux_config.yaml /etc/axoflow-otel-collector/config.yaml
+COPY etw_library_license.txt gofalcon_library_license.txt m365receiver_library_license.txt /etc/axoflow-otel-collector/
 ENTRYPOINT ["/axoflow-otel-collector"]
 CMD ["--config", "/etc/axoflow-otel-collector/config.yaml"]
 EXPOSE 4317 4318 55679

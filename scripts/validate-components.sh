@@ -18,6 +18,7 @@ CURL_RETRY_DELAY_SECONDS=1
 # These are either internal components or components pending upstream inclusion
 EXCEPTION_COMPONENTS=(
   "github.com/axoflow/fluentforwardexporter"
+  "github.com/observiq/bindplane-otel-contrib/receiver/m365receiver"
   "github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector"
   "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver"
   "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver"

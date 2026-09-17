@@ -55,6 +55,7 @@ receivers:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/sqlqueryreceiver v0.156.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/tenableauditlogreceiver v0.156.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/receiver/windowseventlogreceiver v0.156.0
+  - gomod: github.com/observiq/bindplane-otel-contrib/receiver/m365receiver v1.11.0
 
 connectors:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector v0.156.0
@@ -78,11 +79,15 @@ replaces:
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/idirareceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/idirareceiver v0.156.0-axoflow.0
   - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/tenableauditlogreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/tenableauditlogreceiver v0.156.0-axoflow.0
   # Vulnerability patches
-  # GHSA-hrxh-6v49-42gf
-  - google.golang.org/grpc => google.golang.org/grpc v1.82.1
+  # GHSA-hrxh-6v49-42gf, CVE-2026-84303 / CVE-2026-84304 / CVE-2026-84445: xDS RBAC bypass, DATA frame memory DoS. Remove once deps pull in >= v1.83.2.
+  - google.golang.org/grpc => google.golang.org/grpc v1.83.2
   # GO-2026-5970 / CVE-2026-56852: norm.Iter infinite loop on invalid UTF-8. Remove once deps pull in >= v0.39.0.
   - golang.org/x/text => golang.org/x/text v0.39.0
   # CVE-2026-56864 / CVE-2026-56865: sumdb tlog verification bypass. Remove once deps pull in >= v0.40.0.
   - golang.org/x/mod => golang.org/x/mod v0.40.0
   # CVE-2026-10722: integer overflow DoS. Remove once deps pull in >= v0.22.0.
   - github.com/cilium/ebpf => github.com/cilium/ebpf v0.22.0
+  # CVE-2026-56855 / CVE-2026-78662: x/crypto/ssh DoS via crafted messages / channel request flooding. Remove once deps pull in >= v0.56.0.
+  - golang.org/x/crypto => golang.org/x/crypto v0.56.0
+  # CVE-2026-43871: thrift infinite loop DoS. Remove once deps pull in >= v0.24.0.
+  - github.com/apache/thrift => github.com/apache/thrift v0.24.0
