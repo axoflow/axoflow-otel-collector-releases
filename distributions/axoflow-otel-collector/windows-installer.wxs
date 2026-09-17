@@ -68,6 +68,10 @@
                         Name="gofalcon_library_license.txt"
                         Source="gofalcon_library_license.txt"/>
                      <File
+                        Id="m365receiver_library_license.txt"
+                        Name="m365receiver_library_license.txt"
+                        Source="m365receiver_library_license.txt"/>
+                     <File
                         Id="default_config.yaml"
                         Name="default_config.yaml"
                         Source="windows_config.yaml"/>

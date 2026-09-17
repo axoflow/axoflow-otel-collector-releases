@@ -429,6 +429,7 @@ func LicenseFiles() []string {
 	return []string{
 		"etw_library_license.txt",
 		"gofalcon_library_license.txt",
+		"m365receiver_library_license.txt",
 	}
 }
 
