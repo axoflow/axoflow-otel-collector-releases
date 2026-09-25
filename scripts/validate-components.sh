@@ -21,6 +21,7 @@ EXCEPTION_COMPONENTS=(
   "github.com/observiq/bindplane-otel-contrib/receiver/m365receiver"
   "github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector"
   "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver"
+  "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikefdrreceiver"
   "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver"
   "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver"
   "github.com/open-telemetry/opentelemetry-collector-contrib/receiver/idirareceiver"
