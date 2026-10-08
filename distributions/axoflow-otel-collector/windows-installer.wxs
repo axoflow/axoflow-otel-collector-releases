@@ -75,6 +75,10 @@
                         Id="default_config.yaml"
                         Name="default_config.yaml"
                         Source="windows_config.yaml"/>
+                     <File
+                        Id="syslog_config.yaml"
+                        Name="syslog_config.yaml"
+                        Source="windows_syslog_config.yaml"/>
 
                      <ServiceInstall
                         Id="Service"
