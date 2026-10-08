@@ -10,6 +10,7 @@ The installer ships the following components:
 
   * Installs the application (by default) to `C:\Program Files\Axoflow\OpenTelemetry Collector\axoflow-otel-collector.exe`
   * A default configuration that should be edited before use (`C:\ProgramData\Axoflow\OpenTelemetry Collector\config.yaml`).
+  * An alternate, syslog output configuration (`C:\Program Files\Axoflow\OpenTelemetry Collector\syslog_config.yaml`), see [Syslog output](#syslog-output).
 
 ## Configuration
 
@@ -98,6 +99,25 @@ receivers:
     include: ['<ESCAPED_DHCPV6_SERVER_LOGS_PATH>\\DhcpV6SrvLog*']
     ...
 ```
+
+### Syslog output
+
+`syslog_config.yaml` (installed next to the binary) is a drop-in replacement for `config.yaml` that sends the
+event log as syslog instead of OTLP (RFC5424 with a
+`[win@18372.4 ...]` structured data element). A commented out SNARE variant (RFC3164, tab separated
+`MSWinEventLog` record) is included in the file. The DNS and DHCP file receivers are the same as in the default
+configuration and are sent as plain syslog lines.
+
+To use it, copy it over `C:\ProgramData\Axoflow\OpenTelemetry Collector\config.yaml`, set the syslog server:
+
+```yaml
+exporters:
+  syslog:
+    endpoint: 10.0.2.2
+    port: 601
+```
+
+enable the pipelines at the end of the file, and restart the service.
 
 ### Metrics
 
