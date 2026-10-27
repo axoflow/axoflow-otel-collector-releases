@@ -85,13 +85,15 @@ replaces:
   # Vulnerability patches
   # GHSA-hrxh-6v49-42gf, CVE-2026-84303 / CVE-2026-84304 / CVE-2026-84445: xDS RBAC bypass, DATA frame memory DoS. Remove once deps pull in >= v1.83.2.
   - google.golang.org/grpc => google.golang.org/grpc v1.83.2
-  # GO-2026-5970 / CVE-2026-56852: norm.Iter infinite loop on invalid UTF-8. Remove once deps pull in >= v0.39.0.
-  - golang.org/x/text => golang.org/x/text v0.39.0
+  # GO-2026-5970 / CVE-2026-56852 / CVE-2026-56851: norm.Iter infinite loop on invalid UTF-8, precis out-of-bounds slice. v0.42.0 is what x/net v0.60.0 requires. Remove once deps pull in >= v0.42.0.
+  - golang.org/x/text => golang.org/x/text v0.42.0
+  # CVE-2026-78669: HTTP/2 CPU DoS from many SETTINGS frames. Remove once deps pull in >= v0.60.0.
+  - golang.org/x/net => golang.org/x/net v0.60.0
   # CVE-2026-56864 / CVE-2026-56865: sumdb tlog verification bypass. Remove once deps pull in >= v0.40.0.
   - golang.org/x/mod => golang.org/x/mod v0.40.0
   # CVE-2026-10722: integer overflow DoS. Remove once deps pull in >= v0.22.0.
   - github.com/cilium/ebpf => github.com/cilium/ebpf v0.22.0
-  # CVE-2026-56855 / CVE-2026-78662: x/crypto/ssh DoS via crafted messages / channel request flooding. Remove once deps pull in >= v0.56.0.
-  - golang.org/x/crypto => golang.org/x/crypto v0.56.0
+  # CVE-2026-56855 / CVE-2026-78662: x/crypto/ssh DoS via crafted messages / channel request flooding. v0.57.0 is what x/net v0.60.0 requires. Remove once deps pull in >= v0.57.0.
+  - golang.org/x/crypto => golang.org/x/crypto v0.57.0
   # CVE-2026-43871: thrift infinite loop DoS. Remove once deps pull in >= v0.24.0.
   - github.com/apache/thrift => github.com/apache/thrift v0.24.0
