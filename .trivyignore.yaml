@@ -5,3 +5,6 @@ misconfigurations:
     statement: The image that triggers this, requires elevated permissions during runtime. This is not a problem for the Axoflow-signer image, as it is used to sign Windows executables.
   - id: AVD-DS-0014
     statement: The image requires curl to download signing tools during runtime.
+vulnerabilities:
+  - id: GO-2026-5932
+    statement: golang.org/x/crypto/openpgp is unmaintained, but only golang.org/x/crypto/bcrypt is imported (via basicauthextension -> go-htpasswd); the openpgp package is never linked.
