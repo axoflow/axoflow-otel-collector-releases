@@ -1,0 +1,313 @@
+# Alternate configuration: forward Windows logs as syslog instead of OTLP.
+#
+# The event log pipeline emits the Windows "SDATA" output (RFC5424 with a
+# [win@18372.4 ...] structured data element) so an existing syslog connector
+# keeps receiving the same message shape.
+# A commented out "SNARE" variant (RFC3164 + tab separated MSWinEventLog record) is
+# included below; swap the transform and the exporter in the pipeline to use it.
+#
+# To use this file copy it over C:\ProgramData\Axoflow\OpenTelemetry Collector\config.yaml
+# (or point the service at it with --config), set the syslog endpoint, and enable the pipelines.
+
+receivers:
+  # raw must stay off: the syslog transforms read the parsed event fields from the body
+  windows_event_log/application:
+    channel: application
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
+    storage: file_storage
+  windows_event_log/system:
+    channel: system
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
+    storage: file_storage
+  windows_event_log/security:
+    channel: security
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
+    storage: file_storage
+
+  filelog/windows_dns_debug_log:
+    include: ['']
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
+    storage: file_storage
+    resource:
+      com.axoflow.vendor: microsoft
+      com.axoflow.product: windows-dns
+    start_at: beginning
+    multiline:
+      line_start_pattern: '\d\d?/\d\d?/\d{4}'
+
+  filelog/windows_dhcp_server_v4_auditlog:
+    include: ['']
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
+    storage: file_storage
+    start_at: beginning
+    resource:
+      com.axoflow.vendor: microsoft
+      com.axoflow.product: windows-dhcp
+    attributes:
+      dhcp.ip_version: ipv4
+    operators:
+      -  type: filter
+         expr: '!(body matches "^[0-9]+,.*$")'
+
+  filelog/windows_dhcp_server_v6_auditlog:
+    include: ['']
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
+    storage: file_storage
+    start_at: beginning
+    resource:
+      com.axoflow.vendor: microsoft
+      com.axoflow.product: windows-dhcp
+    attributes:
+      dhcp.ip_version: ipv6
+    operators:
+      -  type: filter
+         expr: '!(body matches "^[0-9]+,.*$")'
+
+  nop:
+
+processors:
+  resourcedetection/system:
+    detectors: ["system", "env"]
+    system:
+      hostname_sources: ["dns", "os"]
+      resource_attributes:
+        host.ip:
+          enabled: true
+        host.id:
+          enabled: true
+        host.mac:
+          enabled: true
+
+  resource/agent:
+    attributes:
+    - key: agent
+      value: axoflow-otelcol-agent
+      action: upsert
+
+  # Event log -> SDATA format.
+  transform/syslog_sdata:
+    log_statements:
+      - context: log
+        statements:
+          # $HOST = event Computer field, "Use only hostname" + "Convert to lower-case" defaults
+          - set(attributes["hostname"], ConvertCase(body["computer"], "lower"))
+          # EVENT_SOURCE: RenderingInfo/Provider > Provider@EventSourceName > Provider@Name
+          - set(cache["src"], body["provider"]["name"])
+          - set(cache["src"], body["provider"]["event_source"]) where body["provider"]["event_source"] != nil and body["provider"]["event_source"] != ""
+          - set(cache["src"], body["rendering_info"]["provider"]) where body["rendering_info"]["provider"] != nil and body["rendering_info"]["provider"] != ""
+          # $PROGRAM = EVENT_SOURCE with spaces replaced by _
+          - set(cache["app"], cache["src"])
+          - replace_pattern(cache["app"], " ", "_")
+          # EVENT_TYPE: rendered level, audit keywords override
+          - set(cache["type"], "N/A")
+          - set(cache["type"], body["level"]) where body["level"] != nil
+          - set(cache["type"], "Success Audit") where body["keywords"] != nil and IsMatch(String(body["keywords"]), "Audit Success")
+          - set(cache["type"], "Failure Audit") where body["keywords"] != nil and IsMatch(String(body["keywords"]), "Audit Failure")
+          # EVENT_LEVEL: numeric System/Level reconstructed from the rendered string
+          - set(cache["levelnum"], "0")
+          - set(cache["levelnum"], "1") where body["level"] == "Critical"
+          - set(cache["levelnum"], "2") where body["level"] == "Error"
+          - set(cache["levelnum"], "3") where body["level"] == "Warning"
+          - set(cache["levelnum"], "4") where body["level"] == "Information"
+          - set(cache["levelnum"], "5") where body["level"] == "Verbose"
+          # PRI = default facility local0 (16) | severity derived from the event level and audit keywords
+          - set(attributes["priority"], 135)
+          - set(attributes["priority"], 134) where cache["type"] == "Information"
+          - set(attributes["priority"], 132) where cache["type"] == "Warning"
+          - set(attributes["priority"], 131) where cache["type"] == "Error"
+          - set(attributes["priority"], 130) where cache["type"] == "Critical"
+          - set(attributes["priority"], 131) where cache["type"] == "Verbose"
+          - set(attributes["priority"], 133) where cache["type"] == "Success Audit"
+          - set(attributes["priority"], 132) where cache["type"] == "Failure Audit"
+          # EVENT_SID / EVENT_SID_TYPE
+          - set(cache["sid"], "N/A")
+          - set(cache["sid"], body["security"]["user_id"]) where body["security"]["user_id"] != nil
+          - set(cache["sidtype"], "N/A")
+          - set(cache["sidtype"], "User") where IsMatch(cache["sid"], "^S-1-5-21-")
+          - set(cache["sidtype"], "WellKnownGroup") where IsMatch(cache["sid"], "^S-1-5-(18|19|20)$")
+          # EVENT_USERNAME from EventData, priority order: Target+TargetDomain > Target+Workstation > Subject+SubjectDomain
+          - set(cache["user"], "N/A")
+          - set(cache["user"], Concat([body["event_data"]["SubjectDomainName"], "\\", body["event_data"]["SubjectUserName"]], "")) where body["event_data"]["SubjectUserName"] != nil and body["event_data"]["SubjectDomainName"] != nil
+          - set(cache["user"], Concat([body["event_data"]["Workstation"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["Workstation"] != nil
+          - set(cache["user"], Concat([body["event_data"]["TargetDomainName"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["TargetDomainName"] != nil
+          # EVENT_CATEGORY / EVENT_TASK = RenderingInfo/Task or "None"
+          - set(cache["category"], "None")
+          - set(cache["category"], body["rendering_info"]["task"]) where body["rendering_info"]["task"] != nil and body["rendering_info"]["task"] != ""
+          # EVENT_MSG: tabs to spaces, trailing CRLF stripped
+          - set(cache["msg"], "")
+          - set(cache["msg"], body["message"]) where body["message"] != nil
+          - replace_pattern(cache["msg"], "\t", " ")
+          - replace_pattern(cache["msg"], "\r?\n$", "")
+          # RFC5424 header + structured data
+          - set(attributes["appname"], cache["app"])
+          - >-
+            set(attributes["structured_data"], {
+            "win@18372.4": {
+            "EVENT_CATEGORY": cache["category"],
+            "EVENT_FACILITY": "16",
+            "EVENT_HOST": body["computer"],
+            "EVENT_ID": String(body["event_id"]["id"]),
+            "EVENT_LEVEL": cache["levelnum"],
+            "EVENT_NAME": body["channel"],
+            "EVENT_REC_NUM": String(body["record_id"]),
+            "EVENT_SID": cache["sid"],
+            "EVENT_SID_TYPE": cache["sidtype"],
+            "EVENT_SOURCE": cache["src"],
+            "EVENT_TASK": cache["category"],
+            "EVENT_TYPE": cache["type"],
+            "EVENT_USERNAME": cache["user"]
+            }})
+          # these SD params are omitted when the value is empty
+          - delete_key(attributes["structured_data"]["win@18372.4"], "EVENT_USERNAME") where cache["user"] == "N/A"
+          - delete_key(attributes["structured_data"]["win@18372.4"], "EVENT_SID_TYPE") where cache["sidtype"] == "N/A"
+          - delete_key(attributes["structured_data"]["win@18372.4"], "EVENT_CATEGORY") where cache["category"] == "None"
+          - delete_key(attributes["structured_data"]["win@18372.4"], "EVENT_TASK") where cache["category"] == "None"
+          - >-
+            set(attributes["message"], Concat([
+            cache["user"], ": ", body["channel"], " ", cache["src"],
+            ": [", cache["type"], "] ", cache["msg"],
+            " (EventID ", String(body["event_id"]["id"]), ")"
+            ], ""))
+
+  # DNS / DHCP file logs -> plain syslog: one line per message, program = product name.
+  transform/syslog_file:
+    log_statements:
+      - context: log
+        statements:
+          - set(attributes["hostname"], resource.attributes["host.name"])
+          - set(attributes["appname"], resource.attributes["com.axoflow.product"])
+          - set(attributes["message"], body)
+
+  # Event log -> SNARE format (RFC3164, tab separated MSWinEventLog record).
+  # To use: uncomment this processor and the syslog/snare exporter, then in logs/eventlog replace
+  # transform/syslog_sdata with transform/syslog_snare and syslog with syslog/snare.
+  # transform/syslog_snare:
+  #   log_statements:
+  #     - context: log
+  #       statements:
+  #         - set(attributes["hostname"], ConvertCase(body["computer"], "lower"))
+  #         - set(cache["src"], body["provider"]["name"])
+  #         - set(cache["src"], body["provider"]["event_source"]) where body["provider"]["event_source"] != nil and body["provider"]["event_source"] != ""
+  #         - set(cache["src"], body["rendering_info"]["provider"]) where body["rendering_info"]["provider"] != nil and body["rendering_info"]["provider"] != ""
+  #         - set(cache["type"], "N/A")
+  #         - set(cache["type"], body["level"]) where body["level"] != nil
+  #         - set(cache["type"], "Success Audit") where body["keywords"] != nil and IsMatch(String(body["keywords"]), "Audit Success")
+  #         - set(cache["type"], "Failure Audit") where body["keywords"] != nil and IsMatch(String(body["keywords"]), "Audit Failure")
+  #         - set(attributes["priority"], 135)
+  #         - set(attributes["priority"], 134) where cache["type"] == "Information"
+  #         - set(attributes["priority"], 132) where cache["type"] == "Warning"
+  #         - set(attributes["priority"], 131) where cache["type"] == "Error"
+  #         - set(attributes["priority"], 130) where cache["type"] == "Critical"
+  #         - set(attributes["priority"], 131) where cache["type"] == "Verbose"
+  #         - set(attributes["priority"], 133) where cache["type"] == "Success Audit"
+  #         - set(attributes["priority"], 132) where cache["type"] == "Failure Audit"
+  #         - set(cache["sid"], "N/A")
+  #         - set(cache["sid"], body["security"]["user_id"]) where body["security"]["user_id"] != nil
+  #         - set(cache["sidtype"], "N/A")
+  #         - set(cache["sidtype"], "User") where IsMatch(cache["sid"], "^S-1-5-21-")
+  #         - set(cache["sidtype"], "WellKnownGroup") where IsMatch(cache["sid"], "^S-1-5-(18|19|20)$")
+  #         - set(cache["user"], "N/A")
+  #         - set(cache["user"], Concat([body["event_data"]["SubjectDomainName"], "\\", body["event_data"]["SubjectUserName"]], "")) where body["event_data"]["SubjectUserName"] != nil and body["event_data"]["SubjectDomainName"] != nil
+  #         - set(cache["user"], Concat([body["event_data"]["Workstation"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["Workstation"] != nil
+  #         - set(cache["user"], Concat([body["event_data"]["TargetDomainName"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["TargetDomainName"] != nil
+  #         # EVENT_SNARE_USER: EventData user, else the raw SID, else N/A
+  #         - set(cache["snareuser"], cache["sid"])
+  #         - set(cache["snareuser"], cache["user"]) where cache["user"] != "N/A"
+  #         - set(cache["category"], "None")
+  #         - set(cache["category"], body["rendering_info"]["task"]) where body["rendering_info"]["task"] != nil and body["rendering_info"]["task"] != ""
+  #         - set(cache["msg"], "")
+  #         - set(cache["msg"], body["message"]) where body["message"] != nil
+  #         - replace_pattern(cache["msg"], "[\r\n\t]+", " ")
+  #         # Snare criticality
+  #         - set(cache["crit"], "1")
+  #         - set(cache["crit"], "2") where cache["type"] == "Warning" or cache["type"] == "Failure Audit"
+  #         - set(cache["crit"], "3") where cache["type"] == "Error"
+  #         - set(cache["crit"], "4") where cache["type"] == "Critical"
+  #         # MSWinEventLog crit EVENT_NAME counter datetime EVENT_ID EVENT_SOURCE EVENT_SNARE_USER EVENT_SID_TYPE EVENT_TYPE EVENT_HOST EVENT_CATEGORY EVENT_MSG
+  #         # counter is a per-source running count in the original format; record_id is the stand-in
+  #         - >-
+  #           set(attributes["message"], Concat([
+  #           "MSWinEventLog", cache["crit"], body["channel"], String(body["record_id"]),
+  #           FormatTime(time, "%a %b %d %H:%M:%S %Y"), String(body["event_id"]["id"]),
+  #           cache["src"], cache["snareuser"], cache["sidtype"], cache["type"],
+  #           body["computer"], cache["category"], cache["msg"]
+  #           ], "\t"))
+
+exporters:
+  # Syslog server. Set the endpoint and TLS before use.
+  syslog:
+    endpoint: 10.0.2.2
+    port: 601
+    network: tcp
+    protocol: rfc5424
+    enable_octet_counting: true
+    tls:
+      insecure: true
+    retry_on_failure:
+      enabled: true
+      max_elapsed_time: 0
+    sending_queue:
+      enabled: true
+      storage: file_storage
+
+  # SNARE variant: RFC3164, no octet counting
+  # syslog/snare:
+  #   endpoint: 10.0.2.2
+  #   port: 514
+  #   network: tcp
+  #   protocol: rfc3164
+  #   tls:
+  #     insecure: true
+  #   retry_on_failure:
+  #     enabled: true
+  #     max_elapsed_time: 0
+  #   sending_queue:
+  #     enabled: true
+  #     storage: file_storage
+
+  nop:
+
+extensions:
+  file_storage:
+    directory: C:\ProgramData\Axoflow\OpenTelemetry Collector\storage
+    create_directory: true
+
+service:
+  extensions: [file_storage]
+  telemetry:
+    metrics:
+      level: basic
+      readers:
+      - pull:
+          exporter:
+            prometheus:
+              host: localhost
+              port: 8888
+  pipelines:
+    logs/nop:
+      receivers: [nop]
+      exporters: [nop]
+    # logs/eventlog:
+    #   receivers: [windows_event_log/application, windows_event_log/system, windows_event_log/security]
+    #   processors: [resource/agent, resourcedetection/system, transform/syslog_sdata]
+    #   exporters: [syslog]
+    # logs/dns:
+    #   receivers: [filelog/windows_dns_debug_log]
+    #   processors: [resource/agent, resourcedetection/system, transform/syslog_file]
+    #   exporters: [syslog]
+    # logs/dhcp:
+    #   receivers: [filelog/windows_dhcp_server_v4_auditlog, filelog/windows_dhcp_server_v6_auditlog]
+    #   processors: [resource/agent, resourcedetection/system, transform/syslog_file]
+    #   exporters: [syslog]

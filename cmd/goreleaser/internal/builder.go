@@ -457,7 +457,7 @@ func (b *distributionBuilder) withDefaultConfigIncluded() *distributionBuilder {
 		}
 
 		for i := range d.MsiConfig {
-			d.MsiConfig[i].Files = append(d.MsiConfig[i].Files, "windows_config.yaml")
+			d.MsiConfig[i].Files = append(d.MsiConfig[i].Files, "windows_config.yaml", "windows_syslog_config.yaml")
 			d.MsiConfig[i].Files = append(d.MsiConfig[i].Files, LicenseFiles()...)
 		}
 	})
