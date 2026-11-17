@@ -17,6 +17,7 @@ msi:
       - axoflow.ico
       - README_windows.md
       - windows_config.yaml
+      - windows_syslog_config.yaml
       - etw_library_license.txt
       - gofalcon_library_license.txt
       - m365receiver_library_license.txt
