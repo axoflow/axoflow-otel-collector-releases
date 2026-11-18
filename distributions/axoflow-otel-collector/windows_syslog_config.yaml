@@ -101,11 +101,11 @@ processors:
     log_statements:
       - context: log
         statements:
-          # $HOST = event Computer field, "Use only hostname" + "Convert to lower-case" defaults
+          # $HOST = event Computer field, "Use only hostname" (domain cut from the FQDN) + "Convert to lower-case" defaults
           - set(attributes["hostname"], ConvertCase(body["computer"], "lower"))
-          # EVENT_SOURCE: RenderingInfo/Provider > Provider@EventSourceName > Provider@Name
+          - replace_pattern(attributes["hostname"], "[.].*$", "")
+          # EVENT_SOURCE: RenderingInfo/Provider > Provider@Name
           - set(cache["src"], body["provider"]["name"])
-          - set(cache["src"], body["provider"]["event_source"]) where body["provider"]["event_source"] != nil and body["provider"]["event_source"] != ""
           - set(cache["src"], body["rendering_info"]["provider"]) where body["rendering_info"]["provider"] != nil and body["rendering_info"]["provider"] != ""
           # $PROGRAM = EVENT_SOURCE with spaces replaced by _
           - set(cache["app"], cache["src"])
@@ -137,17 +137,19 @@ processors:
           - set(cache["sidtype"], "N/A")
           - set(cache["sidtype"], "User") where IsMatch(cache["sid"], "^S-1-5-21-")
           - set(cache["sidtype"], "WellKnownGroup") where IsMatch(cache["sid"], "^S-1-5-(18|19|20)$")
-          # EVENT_USERNAME from EventData, priority order: Target+TargetDomain > Target+Workstation > Subject+SubjectDomain
+          # EVENT_USERNAME from EventData, priority order: Target+TargetDomain > Target+Workstation > Subject+SubjectDomain; empty values are skipped
           - set(cache["user"], "N/A")
-          - set(cache["user"], Concat([body["event_data"]["SubjectDomainName"], "\\", body["event_data"]["SubjectUserName"]], "")) where body["event_data"]["SubjectUserName"] != nil and body["event_data"]["SubjectDomainName"] != nil
-          - set(cache["user"], Concat([body["event_data"]["Workstation"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["Workstation"] != nil
-          - set(cache["user"], Concat([body["event_data"]["TargetDomainName"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["TargetDomainName"] != nil
-          # EVENT_CATEGORY / EVENT_TASK = RenderingInfo/Task or "None"
+          - set(cache["user"], Concat([body["event_data"]["SubjectDomainName"], "\\", body["event_data"]["SubjectUserName"]], "")) where body["event_data"]["SubjectUserName"] != nil and body["event_data"]["SubjectUserName"] != "" and body["event_data"]["SubjectDomainName"] != nil and body["event_data"]["SubjectDomainName"] != ""
+          - set(cache["user"], Concat([body["event_data"]["Workstation"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["TargetUserName"] != "" and body["event_data"]["Workstation"] != nil and body["event_data"]["Workstation"] != ""
+          - set(cache["user"], Concat([body["event_data"]["TargetDomainName"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["TargetUserName"] != "" and body["event_data"]["TargetDomainName"] != nil and body["event_data"]["TargetDomainName"] != ""
+          # EVENT_CATEGORY = RenderingInfo/Task or "None"; EVENT_TASK = RenderingInfo/Task, omitted when there is none
           - set(cache["category"], "None")
           - set(cache["category"], body["rendering_info"]["task"]) where body["rendering_info"]["task"] != nil and body["rendering_info"]["task"] != ""
-          # EVENT_MSG: tabs to spaces, trailing CRLF stripped
+          # EVENT_MSG: full rendered message (body["message"] is only the first line on the Security channel),
+          # tabs to spaces, trailing CRLF stripped
           - set(cache["msg"], "")
           - set(cache["msg"], body["message"]) where body["message"] != nil
+          - set(cache["msg"], body["rendering_info"]["message"]) where body["rendering_info"]["message"] != nil and body["rendering_info"]["message"] != ""
           - replace_pattern(cache["msg"], "\t", " ")
           - replace_pattern(cache["msg"], "\r?\n$", "")
           # RFC5424 header + structured data
@@ -172,7 +174,6 @@ processors:
           # these SD params are omitted when the value is empty
           - delete_key(attributes["structured_data"]["win@18372.4"], "EVENT_USERNAME") where cache["user"] == "N/A"
           - delete_key(attributes["structured_data"]["win@18372.4"], "EVENT_SID_TYPE") where cache["sidtype"] == "N/A"
-          - delete_key(attributes["structured_data"]["win@18372.4"], "EVENT_CATEGORY") where cache["category"] == "None"
           - delete_key(attributes["structured_data"]["win@18372.4"], "EVENT_TASK") where cache["category"] == "None"
           - >-
             set(attributes["message"], Concat([
@@ -198,8 +199,8 @@ processors:
   #     - context: log
   #       statements:
   #         - set(attributes["hostname"], ConvertCase(body["computer"], "lower"))
+  #         - replace_pattern(attributes["hostname"], "[.].*$", "")
   #         - set(cache["src"], body["provider"]["name"])
-  #         - set(cache["src"], body["provider"]["event_source"]) where body["provider"]["event_source"] != nil and body["provider"]["event_source"] != ""
   #         - set(cache["src"], body["rendering_info"]["provider"]) where body["rendering_info"]["provider"] != nil and body["rendering_info"]["provider"] != ""
   #         - set(cache["type"], "N/A")
   #         - set(cache["type"], body["level"]) where body["level"] != nil
@@ -219,17 +220,21 @@ processors:
   #         - set(cache["sidtype"], "User") where IsMatch(cache["sid"], "^S-1-5-21-")
   #         - set(cache["sidtype"], "WellKnownGroup") where IsMatch(cache["sid"], "^S-1-5-(18|19|20)$")
   #         - set(cache["user"], "N/A")
-  #         - set(cache["user"], Concat([body["event_data"]["SubjectDomainName"], "\\", body["event_data"]["SubjectUserName"]], "")) where body["event_data"]["SubjectUserName"] != nil and body["event_data"]["SubjectDomainName"] != nil
-  #         - set(cache["user"], Concat([body["event_data"]["Workstation"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["Workstation"] != nil
-  #         - set(cache["user"], Concat([body["event_data"]["TargetDomainName"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["TargetDomainName"] != nil
+  #         - set(cache["user"], Concat([body["event_data"]["SubjectDomainName"], "\\", body["event_data"]["SubjectUserName"]], "")) where body["event_data"]["SubjectUserName"] != nil and body["event_data"]["SubjectUserName"] != "" and body["event_data"]["SubjectDomainName"] != nil and body["event_data"]["SubjectDomainName"] != ""
+  #         - set(cache["user"], Concat([body["event_data"]["Workstation"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["TargetUserName"] != "" and body["event_data"]["Workstation"] != nil and body["event_data"]["Workstation"] != ""
+  #         - set(cache["user"], Concat([body["event_data"]["TargetDomainName"], "\\", body["event_data"]["TargetUserName"]], "")) where body["event_data"]["TargetUserName"] != nil and body["event_data"]["TargetUserName"] != "" and body["event_data"]["TargetDomainName"] != nil and body["event_data"]["TargetDomainName"] != ""
   #         # EVENT_SNARE_USER: EventData user, else the raw SID, else N/A
   #         - set(cache["snareuser"], cache["sid"])
   #         - set(cache["snareuser"], cache["user"]) where cache["user"] != "N/A"
   #         - set(cache["category"], "None")
   #         - set(cache["category"], body["rendering_info"]["task"]) where body["rendering_info"]["task"] != nil and body["rendering_info"]["task"] != ""
+  #         # EVENT_MSG: trailing CRLF stripped, CRLF to two spaces, TAB (and any stray CR/LF) to one space
   #         - set(cache["msg"], "")
   #         - set(cache["msg"], body["message"]) where body["message"] != nil
-  #         - replace_pattern(cache["msg"], "[\r\n\t]+", " ")
+  #         - set(cache["msg"], body["rendering_info"]["message"]) where body["rendering_info"]["message"] != nil and body["rendering_info"]["message"] != ""
+  #         - replace_pattern(cache["msg"], "\r?\n$", "")
+  #         - replace_pattern(cache["msg"], "\r\n", "  ")
+  #         - replace_pattern(cache["msg"], "[\r\n\t]", " ")
   #         # Snare criticality
   #         - set(cache["crit"], "1")
   #         - set(cache["crit"], "2") where cache["type"] == "Warning" or cache["type"] == "Failure Audit"
