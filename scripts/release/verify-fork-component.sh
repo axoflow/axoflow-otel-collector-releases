@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+# Verify a fork component the way the distro consumes it. Usage: verify-fork-component.sh <component-dir>
+# Runs build, vet and race tests (plus a GOOS=windows build/vet when there is windows code), then
+# repeats build+test with every `=> ../` replace stripped: replaces in a dependency's go.mod are
+# ignored by the distro build, so a stale in-repo copy must not be what makes it pass.
+set -euo pipefail
+cd "$1"
+go mod tidy
+go build ./...
+go vet ./...
+if grep -rlq '^//go:build windows' --include='*.go' .; then
+  GOOS=windows go build ./...
+  GOOS=windows go vet ./...
+fi
+go test -race ./...
+
+trap 'rm -f go.distro.mod go.distro.sum' EXIT
+grep -v '=> \.\./' go.mod >go.distro.mod
+cp go.sum go.distro.sum
+go mod tidy -modfile=go.distro.mod
+go build -modfile=go.distro.mod ./...
+go test -modfile=go.distro.mod ./...
+echo "VERIFIED $(basename "$PWD")"
