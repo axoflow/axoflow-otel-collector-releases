@@ -4,7 +4,8 @@ GORELEASER ?= goreleaser
 # renovate: datasource=github-releases depName=OCB packageName=open-telemetry/opentelemetry-collector
 OTELCOL_BUILDER_VERSION ?= 0.166.0
 OTELCOL_BUILDER_DIR ?= ${HOME}/bin
-OTELCOL_BUILDER ?= ${OTELCOL_BUILDER_DIR}/ocb
+# Versioned so a stale ocb (on PATH or from an older bump) is never picked up.
+OTELCOL_BUILDER ?= ${OTELCOL_BUILDER_DIR}/ocb-${OTELCOL_BUILDER_VERSION}
 
 DISTRIBUTIONS ?= "axoflow-otel-collector"
 
@@ -49,7 +50,6 @@ golden-record:
 
 .PHONY: ocb
 ocb:
-ifeq (, $(shell command -v ocb 2>/dev/null))
 	@{ \
 	[ ! -x '$(OTELCOL_BUILDER)' ] || exit 0; \
 	set -e ;\
@@ -63,9 +63,6 @@ ifeq (, $(shell command -v ocb 2>/dev/null))
 	mv $$(go env GOPATH)/bin/builder $(OTELCOL_BUILDER) ;\
 	}
 	go env -w GOPRIVATE="github.com/axoflow"
-else
-OTELCOL_BUILDER=$(shell command -v ocb)
-endif
 
 .PHONY: go
 go:
