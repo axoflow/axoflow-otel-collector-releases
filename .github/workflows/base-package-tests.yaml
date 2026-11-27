@@ -36,3 +36,9 @@ jobs:
           MATRIX_TYPE: ${{ matrix.type }}
           INPUTS_DISTRIBUTION: ${{ inputs.distribution }}
         run: ./scripts/package-tests/package-tests.sh ./axoflow-otel-collector*-SNAPSHOT-*_linux_amd64.${MATRIX_TYPE} ${INPUTS_DISTRIBUTION}
+
+      - name: Test ${{ matrix.type }} package installation during Docker image build
+        env:
+          MATRIX_TYPE: ${{ matrix.type }}
+          INPUTS_DISTRIBUTION: ${{ inputs.distribution }}
+        run: ./scripts/package-tests/docker-build-test.sh ./axoflow-otel-collector*-SNAPSHOT-*_linux_amd64.${MATRIX_TYPE} ${INPUTS_DISTRIBUTION}
