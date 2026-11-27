@@ -16,4 +16,8 @@ jobs:
       goos: '[ "linux", "windows" ]'
       goarch: '[ "amd64", "arm64" ]'
     secrets: inherit
-    permissions: write-all
+    permissions:
+      contents: write
+      id-token: write
+      packages: write
+      security-events: write
