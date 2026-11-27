@@ -30,14 +30,17 @@ diff contains upstream changes *beyond* what the entry describes.
 
 ## Step 3 — Gather context per changed file
 
-For each mapped file with a non-empty diff, get the upstream rationale:
+For each mapped file with a non-empty diff, get the upstream rationale from the commits since
+the last run — the **Last triaged upstream commit** recorded in
+[references/known-divergences.md](references/known-divergences.md):
 
 ```bash
-version=$(grep -m1 'version:' distributions/axoflow-otel-collector/manifest.yaml | sed 's/.*: *//; s/-axoflow.*//')
-git log --oneline "v${version}..upstream/main" -- <upstream-path>
+last=$(grep -m1 -o 'Last triaged upstream commit:\*\* `[0-9a-f]*`' .claude/skills/upstream-adopt/references/known-divergences.md | grep -o '[0-9a-f]\{7,\}')
+git log --oneline --no-merges "${last}..upstream/main" -- <upstream-path>
 ```
 
-(If the tag range fails, fall back to `git log --oneline -10 upstream/main -- <path>`.)
+Don't derive the range from the manifest version: a version bump moves it past commits that
+were never triaged.
 Read the actual diff hunks, not just stats — triage is per logical change, not per file.
 One file can yield multiple findings in different categories.
 
@@ -72,7 +75,8 @@ costs. Wait for the user's verdicts on `ask` items before applying anything.
    never blind-copy an upstream file over a customized one; re-apply our deltas.
 3. Validate: `make generate && make check` must pass. Fix or drop a change that breaks it.
 4. If the user permanently rejected something that will keep showing in future diffs, append
-   it to [references/known-divergences.md](references/known-divergences.md) in the same run.
+   it to [references/known-divergences.md](references/known-divergences.md) in the same run,
+   and set its **Last triaged upstream commit** to the `upstream/main` commit this run triaged.
 5. Commit per logical change (atomic), reference upstream commit SHAs in the message body.
 
 ## Path mapping
