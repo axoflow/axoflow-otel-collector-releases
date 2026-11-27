@@ -12,6 +12,23 @@ on:
       goarch:
         required: true
         type: string
+    secrets:
+      GORELEASER_KEY:
+        required: true
+      DEPLOY_KEY_PRIVATE_FOR_AXO_ETW:
+        required: true
+      WIF_PROVIDER:
+        required: true
+      EV_WIF_SERVICE_ACCOUNT:
+        required: true
+      EV_GCP_PROJECT_ID:
+        required: true
+      EV_GCP_KEY_RING:
+        required: true
+      EV_GCP_KEY_NAME:
+        required: true
+      EV_CERTIFICATE_CRT:
+        required: true
 
 permissions:
   contents: read

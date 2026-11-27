@@ -12,6 +12,11 @@ on:
       goarch:
         required: true
         type: string
+    secrets:
+      GORELEASER_KEY:
+        required: false
+      DEPLOY_KEY_PRIVATE_FOR_AXO_ETW:
+        required: false
 
 permissions:
   contents: read
