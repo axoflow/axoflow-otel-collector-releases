@@ -73,7 +73,7 @@ podman build -t "$image_name" -f "$SCRIPT_DIR/Dockerfile.test.$pkg_type" "$SCRIP
 podman rm -fv "$container_name" >/dev/null 2>&1 || true
 
 # test install
-podman run --name "$container_name" -d "$image_name"
+podman run --name "$container_name" --privileged -v /sys/fs/cgroup:/sys/fs/cgroup:ro -d "$image_name"
 
 # ensure that the system is up and running by checking if systemctl is running
 # TODO(MovieStoreGuy): re-enable when we have a way validate that systemd is fully running
@@ -116,6 +116,10 @@ echo "Checking $PROCESS_NAME process ..."
 if [ "$DISTRO" = "axoflow-otel-collector" ]; then
   $container_exec pgrep -a -u axoflow-otel-collector -f "$PROCESS_NAME"
 fi
+
+# Check the effective installed settings and the running process.
+podman_cp "$container_name" "$SCRIPT_DIR/check-service-hardening.sh" /tmp/check-service-hardening.sh
+$container_exec bash /tmp/check-service-hardening.sh "$SERVICE_NAME"
 
 # test uninstall
 echo

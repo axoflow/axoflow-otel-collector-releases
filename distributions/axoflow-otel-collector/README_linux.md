@@ -50,6 +50,19 @@ You can read more about the OpenTelemetry Collector configuration in it's offici
 
 By default metrics are enabled on `basic` level and are available on `localhost:8888/metrics`.
 
+### Listening on ports below 1024
+
+The systemd service runs hardened (`NoNewPrivileges=true`, among others), so file capabilities set on the binary are ignored. To let a receiver listen on a port below 1024, grant the capability to the service with a drop-in:
+
+```shell
+sudo systemctl edit axoflow-otel-collector
+```
+
+```ini
+[Service]
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+```
+
 ## Support
 
 If you have any questions, get in touch with us on [Discord](https://discord.gg/583Z4wjem2)!
