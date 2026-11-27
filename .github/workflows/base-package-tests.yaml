@@ -32,4 +32,7 @@ jobs:
           name: linux-packages
 
       - name: Test ${{ matrix.type }} package
-        run: ./scripts/package-tests/package-tests.sh ./axoflow-otel-collector*-SNAPSHOT-*_linux_amd64.${{ matrix.type }} ${{ inputs.distribution }}
+        env:
+          MATRIX_TYPE: ${{ matrix.type }}
+          INPUTS_DISTRIBUTION: ${{ inputs.distribution }}
+        run: ./scripts/package-tests/package-tests.sh ./axoflow-otel-collector*-SNAPSHOT-*_linux_amd64.${MATRIX_TYPE} ${INPUTS_DISTRIBUTION}

@@ -21,6 +21,8 @@ env:
   GORELEASER_PRO_VERSION: v2.20.3
   GONOSUMDB: github.com/axoflow/*
   GOPRIVATE: github.com/axoflow/*
+  # read as ${INPUTS_DISTRIBUTION} in run: scripts, never interpolated into them
+  INPUTS_DISTRIBUTION: ${{ inputs.distribution }}
 
 jobs:
   check-goreleaser:
@@ -86,36 +88,36 @@ jobs:
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
 
       - name: Print built artifacts
-        run: cat ./distributions/${{ inputs.distribution }}/dist/**/artifacts.json
+        run: cat ./distributions/${INPUTS_DISTRIBUTION}/dist/**/artifacts.json
 
       - name: Print metadata
-        run: cat ./distributions/${{ inputs.distribution }}/dist/**/metadata.json
+        run: cat ./distributions/${INPUTS_DISTRIBUTION}/dist/**/metadata.json
 
       - name: Print dist folder contents
-        run: ls -laR ./distributions/${{ inputs.distribution }}/dist
+        run: ls -laR ./distributions/${INPUTS_DISTRIBUTION}/dist
 
       - name: Smoke test container image
         if: ${{ matrix.GOOS == 'linux' && matrix.GOARCH == 'amd64' }}
         run: |
-          docker run --name ${{ inputs.distribution }} \
+          docker run --name ${INPUTS_DISTRIBUTION} \
             -d \
             -v ${PWD}/tests/docker-tests/default-config.yaml:/config.yaml \
-            ghcr.io/axoflow/${{ inputs.distribution }}/${{ inputs.distribution }}:latest-amd64 \
+            ghcr.io/axoflow/${INPUTS_DISTRIBUTION}/${INPUTS_DISTRIBUTION}:latest-amd64 \
             --config /config.yaml
           sleep 10
-          docker logs ${{ inputs.distribution }} &>docker-logs-${{ inputs.distribution }}.log
-          if grep "Everything is ready." docker-logs-${{ inputs.distribution }}.log; then
-            echo "${{ inputs.distribution }} started up correctly"
+          docker logs ${INPUTS_DISTRIBUTION} &>docker-logs-${INPUTS_DISTRIBUTION}.log
+          if grep "Everything is ready." docker-logs-${INPUTS_DISTRIBUTION}.log; then
+            echo "${INPUTS_DISTRIBUTION} started up correctly"
           else
-            echo "${{ inputs.distribution }} failed to start"
-            cat docker-logs-${{ inputs.distribution }}.log
+            echo "${INPUTS_DISTRIBUTION} failed to start"
+            cat docker-logs-${INPUTS_DISTRIBUTION}.log
             exit 1
           fi
-          docker rm -f ${{ inputs.distribution }}
+          docker rm -f ${INPUTS_DISTRIBUTION}
 
       - name: Run golden test
         if: ${{ matrix.GOOS == 'linux' && matrix.GOARCH == 'amd64' }}
-        run: make golden-test IMG=ghcr.io/axoflow/${{ inputs.distribution }}/${{ inputs.distribution }}:latest-amd64
+        run: make golden-test IMG=ghcr.io/axoflow/${INPUTS_DISTRIBUTION}/${INPUTS_DISTRIBUTION}:latest-amd64
 
       - name: Upload linux service packages
         if: ${{ matrix.GOOS == 'linux' && matrix.GOARCH == 'amd64' }}

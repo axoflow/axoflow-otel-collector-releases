@@ -65,7 +65,7 @@ jobs:
 
       - name: Run version update script
         shell: bash
-        run: ./scripts/pre-update-version.sh "${{ github.ref_name }}"
+        run: ./scripts/pre-update-version.sh "$GITHUB_REF_NAME"
 
       - name: Setup private module access
         env:
@@ -151,7 +151,7 @@ jobs:
 
       - name: Build Axoflow-signer
         shell: bash
-        run: ./signer-image/build-signer.sh "${{ github.ref_name }}"
+        run: ./signer-image/build-signer.sh "$GITHUB_REF_NAME"
 
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -174,23 +174,28 @@ jobs:
 
       - name: Setup Google Cloud KMS for Windows MSI code signing
         shell: bash
+        env:
+          EV_GCP_PROJECT_ID: ${{ secrets.EV_GCP_PROJECT_ID }}
+          EV_GCP_KEY_RING: ${{ secrets.EV_GCP_KEY_RING }}
+          EV_GCP_KEY_NAME: ${{ secrets.EV_GCP_KEY_NAME }}
+          EV_CERTIFICATE_CRT: ${{ secrets.EV_CERTIFICATE_CRT }}
         run: |
           cat > /tmp/kmsp11-config.yaml << EOF
           ---
           tokens:
-            - key_ring: "projects/${{ secrets.EV_GCP_PROJECT_ID }}/locations/global/keyRings/${{ secrets.EV_GCP_KEY_RING }}"
+            - key_ring: "projects/${EV_GCP_PROJECT_ID}/locations/global/keyRings/${EV_GCP_KEY_RING}"
           EOF
           chmod 600 /tmp/kmsp11-config.yaml
 
-          echo "${{ secrets.EV_CERTIFICATE_CRT }}" | base64 -d > /tmp/certificate.crt
+          echo "${EV_CERTIFICATE_CRT}" | base64 -d > /tmp/certificate.crt
 
           echo "KMS_PKCS11_CONFIG=/tmp/kmsp11-config.yaml" >> $GITHUB_ENV
           echo "CERTIFICATE_CRT_PATH=/tmp/certificate.crt" >> $GITHUB_ENV
-          echo "GCP_KEY_NAME=${{ secrets.EV_GCP_KEY_NAME }}" >> $GITHUB_ENV
+          echo "GCP_KEY_NAME=${EV_GCP_KEY_NAME}" >> $GITHUB_ENV
 
       - name: Sign Windows MSI installers
         shell: bash
-        run: ./scripts/ev-sign.sh "${{ github.ref_name }}"
+        run: ./scripts/ev-sign.sh "$GITHUB_REF_NAME"
 
       - uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
         with:
