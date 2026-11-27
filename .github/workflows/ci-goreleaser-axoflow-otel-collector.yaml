@@ -34,7 +34,9 @@ jobs:
       distribution: axoflow-otel-collector
       goos: '[ "linux", "windows" ]'
       goarch: '[ "amd64", "arm64" ]'
-    secrets: inherit
+    secrets:
+      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+      DEPLOY_KEY_PRIVATE_FOR_AXO_ETW: ${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW }}
 
   package-tests:
     name: Package tests

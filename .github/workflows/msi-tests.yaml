@@ -22,23 +22,27 @@ jobs:
         type: ${{ fromJSON(inputs.type) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Download built artifacts
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: msi-packages
 
       - name: Set required environment variables for MSI tests
+        env:
+          INPUTS_DISTRIBUTION: ${{ inputs.distribution }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $alt_config_path = Resolve-Path .\distributions\${{ inputs.distribution }}\windows_config.yaml
+          $alt_config_path = Resolve-Path .\distributions\$env:INPUTS_DISTRIBUTION\windows_config.yaml
           Test-Path $alt_config_path
           $msi_path = Resolve-Path .\msi\*\*.msi
           Test-Path $msi_path
           "MSI_TEST_ALTERNATE_CONFIG_FILE=$alt_config_path" | Out-File -FilePath $env:GITHUB_ENV -Append
           "MSI_TEST_COLLECTOR_PATH=$msi_path" | Out-File -FilePath $env:GITHUB_ENV -Append
-          "MSI_TEST_COLLECTOR_SERVICE_NAME=${{ inputs.distribution }}" | Out-File -FilePath $env:GITHUB_ENV -Append
+          "MSI_TEST_COLLECTOR_SERVICE_NAME=$env:INPUTS_DISTRIBUTION" | Out-File -FilePath $env:GITHUB_ENV -Append
 
       - name: Run the MSI tests
         working-directory: tests/msi

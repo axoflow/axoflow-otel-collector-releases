@@ -15,5 +15,17 @@ jobs:
       distribution: axoflow-otel-collector
       goos: '[ "linux", "windows" ]'
       goarch: '[ "amd64", "arm64" ]'
-    secrets: inherit
-    permissions: write-all
+    secrets:
+      GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
+      DEPLOY_KEY_PRIVATE_FOR_AXO_ETW: ${{ secrets.DEPLOY_KEY_PRIVATE_FOR_AXO_ETW }}
+      WIF_PROVIDER: ${{ secrets.WIF_PROVIDER }}
+      EV_WIF_SERVICE_ACCOUNT: ${{ secrets.EV_WIF_SERVICE_ACCOUNT }}
+      EV_GCP_PROJECT_ID: ${{ secrets.EV_GCP_PROJECT_ID }}
+      EV_GCP_KEY_RING: ${{ secrets.EV_GCP_KEY_RING }}
+      EV_GCP_KEY_NAME: ${{ secrets.EV_GCP_KEY_NAME }}
+      EV_CERTIFICATE_CRT: ${{ secrets.EV_CERTIFICATE_CRT }}
+    permissions:
+      contents: write
+      id-token: write
+      packages: write
+      security-events: write

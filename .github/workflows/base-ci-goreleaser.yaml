@@ -12,15 +12,22 @@ on:
       goarch:
         required: true
         type: string
+    secrets:
+      GORELEASER_KEY:
+        required: false
+      DEPLOY_KEY_PRIVATE_FOR_AXO_ETW:
+        required: false
 
 permissions:
   contents: read
 
 env:
   # renovate: datasource=github-releases packageName=goreleaser/goreleaser-pro
-  GORELEASER_PRO_VERSION: v2.17.0
+  GORELEASER_PRO_VERSION: v2.20.3
   GONOSUMDB: github.com/axoflow/*
   GOPRIVATE: github.com/axoflow/*
+  # read as ${INPUTS_DISTRIBUTION} in run: scripts, never interpolated into them
+  INPUTS_DISTRIBUTION: ${{ inputs.distribution }}
 
 jobs:
   check-goreleaser:
@@ -32,12 +39,13 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
 
       - name: Setup QEMU
-        uses: docker/setup-qemu-action@96fe6ef7f33517b61c61be40b68a1882f3264fb8 # v4.2.0
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
         with:
           platforms: arm64
 
@@ -48,12 +56,12 @@ jobs:
           sudo apt-get install -y wixl
 
       - name: Setup Docker Buildx
-        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+        uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
 
       - name: Setup Go
-        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6.5.0
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0 # zizmor: ignore[cache-poisoning] Go caches are content-addressed and dependencies are verified by go.sum
         with:
-          go-version: "~1.26.0"
+          go-version: "~1.27.0"
           check-latest: true
 
       - name: Run version update script
@@ -71,7 +79,7 @@ jobs:
         run: make generate-sources # inherits SSH_AUTH_SOCK from the previous step via $GITHUB_ENV
 
       - name: Run GoReleaser for ${{ inputs.distribution }}
-        uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7.2.3
+        uses: goreleaser/goreleaser-action@a4f02ab5355a589de60d917a659ce617ed19b3de # v7.3.0
         with:
           distribution: goreleaser-pro
           version: ${{ env.GORELEASER_PRO_VERSION }}
@@ -85,40 +93,40 @@ jobs:
           GORELEASER_KEY: ${{ secrets.GORELEASER_KEY }}
 
       - name: Print built artifacts
-        run: cat ./distributions/${{ inputs.distribution }}/dist/**/artifacts.json
+        run: cat ./distributions/${INPUTS_DISTRIBUTION}/dist/**/artifacts.json
 
       - name: Print metadata
-        run: cat ./distributions/${{ inputs.distribution }}/dist/**/metadata.json
+        run: cat ./distributions/${INPUTS_DISTRIBUTION}/dist/**/metadata.json
 
       - name: Print dist folder contents
-        run: ls -laR ./distributions/${{ inputs.distribution }}/dist
+        run: ls -laR ./distributions/${INPUTS_DISTRIBUTION}/dist
 
       - name: Smoke test container image
         if: ${{ matrix.GOOS == 'linux' && matrix.GOARCH == 'amd64' }}
         run: |
-          docker run --name ${{ inputs.distribution }} \
+          docker run --name ${INPUTS_DISTRIBUTION} \
             -d \
             -v ${PWD}/tests/docker-tests/default-config.yaml:/config.yaml \
-            ghcr.io/axoflow/${{ inputs.distribution }}/${{ inputs.distribution }}:latest-amd64 \
+            ghcr.io/axoflow/${INPUTS_DISTRIBUTION}/${INPUTS_DISTRIBUTION}:latest-amd64 \
             --config /config.yaml
           sleep 10
-          docker logs ${{ inputs.distribution }} &>docker-logs-${{ inputs.distribution }}.log
-          if grep "Everything is ready." docker-logs-${{ inputs.distribution }}.log; then
-            echo "${{ inputs.distribution }} started up correctly"
+          docker logs ${INPUTS_DISTRIBUTION} &>docker-logs-${INPUTS_DISTRIBUTION}.log
+          if grep "Everything is ready." docker-logs-${INPUTS_DISTRIBUTION}.log; then
+            echo "${INPUTS_DISTRIBUTION} started up correctly"
           else
-            echo "${{ inputs.distribution }} failed to start"
-            cat docker-logs-${{ inputs.distribution }}.log
+            echo "${INPUTS_DISTRIBUTION} failed to start"
+            cat docker-logs-${INPUTS_DISTRIBUTION}.log
             exit 1
           fi
-          docker rm -f ${{ inputs.distribution }}
+          docker rm -f ${INPUTS_DISTRIBUTION}
 
       - name: Run golden test
         if: ${{ matrix.GOOS == 'linux' && matrix.GOARCH == 'amd64' }}
-        run: make golden-test IMG=ghcr.io/axoflow/${{ inputs.distribution }}/${{ inputs.distribution }}:latest-amd64
+        run: make golden-test IMG=ghcr.io/axoflow/${INPUTS_DISTRIBUTION}/${INPUTS_DISTRIBUTION}:latest-amd64
 
       - name: Upload linux service packages
         if: ${{ matrix.GOOS == 'linux' && matrix.GOARCH == 'amd64' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: linux-packages
           path: distributions/${{ inputs.distribution }}/dist/linux_amd64_v1/*
@@ -126,7 +134,7 @@ jobs:
 
       - name: Upload MSI packages
         if: ${{ matrix.GOOS == 'windows' && matrix.GOARCH == 'amd64' }}
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: msi-packages
           path: distributions/${{ inputs.distribution }}/dist/windows_amd64_v1/**/*.msi
