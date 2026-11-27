@@ -25,7 +25,7 @@ exporters:
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/fileexporter v0.166.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/prometheusexporter v0.166.0
   - gomod: github.com/open-telemetry/opentelemetry-collector-contrib/exporter/syslogexporter v0.166.0
-  - gomod: github.com/axoflow/fluentforwardexporter v0.166.0-axoflow.0-rc1
+  - gomod: github.com/axoflow/fluentforwardexporter v0.166.0-axoflow.0
 
 processors:
   - gomod: go.opentelemetry.io/collector/processor/batchprocessor v0.166.0
@@ -74,12 +74,12 @@ providers:
 # When adding a replace, add a comment before it to document why it's needed and when it can be removed
 replaces:
   # Axoflow specific replacements for patched/additional components
-  - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.166.0-axoflow.0-rc1
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/crowdstrikereceiver v0.166.0-axoflow.0-rc1
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikefdrreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/crowdstrikefdrreceiver v0.166.0-axoflow.0-rc1
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.166.0-axoflow.0-rc1
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver v0.166.0-axoflow.0-rc1
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/idirareceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/idirareceiver v0.166.0-axoflow.0-rc1
-  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/tenableauditlogreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/tenableauditlogreceiver v0.166.0-axoflow.0-rc1
+  - github.com/open-telemetry/opentelemetry-collector-contrib/connector/bytesconnector =>  github.com/axoflow/opentelemetry-collector-contrib/connector/bytesconnector v0.166.0-axoflow.0
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikereceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/crowdstrikereceiver v0.166.0-axoflow.0
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/crowdstrikefdrreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/crowdstrikefdrreceiver v0.166.0-axoflow.0
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/etwreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/etwreceiver v0.166.0-axoflow.0
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/elasticsearchlogsreceiver v0.166.0-axoflow.0
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/idirareceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/idirareceiver v0.166.0-axoflow.0
+  - github.com/open-telemetry/opentelemetry-collector-contrib/receiver/tenableauditlogreceiver => github.com/axoflow/opentelemetry-collector-contrib/receiver/tenableauditlogreceiver v0.166.0-axoflow.0
   # Vulnerability patches
   # (cleared for v0.166.0 — repopulate from the fresh CVE/trivy scan results in a separate `fix: vulnerabilities` commit)
