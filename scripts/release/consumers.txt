@@ -1,0 +1,6 @@
+# Release-tracking references to the published collector image/binary in downstream repos.
+# Format: <repo dir, a sibling of this repo> <origin base branch> <file>
+# Only files listed here are touched by bump-consumers.sh. Keep historical pins OUT of this list
+# (feature/compat version markers, captured test fixtures, "confirmed against" notes).
+# Consumers that aren't public keep the same format in their own file: CONSUMERS=<file>.
+telemetry-controller main pkg/resources/manager/collector_manager.go
