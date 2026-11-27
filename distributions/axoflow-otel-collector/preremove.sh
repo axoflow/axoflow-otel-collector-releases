@@ -5,7 +5,9 @@
 
 if [ "$1" != "1" ]; then
     if command -v systemctl >/dev/null 2>&1; then
-        systemctl stop axoflow-otel-collector.service
+        if [ -d /run/systemd/system ]; then
+            systemctl stop axoflow-otel-collector.service
+        fi
         systemctl disable axoflow-otel-collector.service
     fi
 fi
