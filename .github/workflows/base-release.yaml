@@ -139,7 +139,7 @@ jobs:
 
       - uses: sigstore/cosign-installer@881c63bd87e38389154debd8331404ce7ca8a3ab # v4.1.4
         with:
-          cosign-release: "v2.6.1"
+          cosign-release: "v3.1.6"
 
       - uses: anchore/sbom-action/download-syft@dfcb83b97731532d72be422cbc51ee64adb6fd56 # v0.24.4
 
