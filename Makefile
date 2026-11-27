@@ -2,7 +2,7 @@ GO ?= go
 GORELEASER ?= goreleaser
 
 # renovate: datasource=github-releases depName=OCB packageName=open-telemetry/opentelemetry-collector
-OTELCOL_BUILDER_VERSION ?= 0.156.0
+OTELCOL_BUILDER_VERSION ?= 0.166.0
 OTELCOL_BUILDER_DIR ?= ${HOME}/bin
 OTELCOL_BUILDER ?= ${OTELCOL_BUILDER_DIR}/ocb
 
