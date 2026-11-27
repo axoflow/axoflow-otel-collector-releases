@@ -8,7 +8,7 @@ import (
 	"log"
 	"os"
 
-	"go.yaml.in/yaml/v3"
+	"go.yaml.in/yaml/v4"
 
 	"github.com/open-telemetry/opentelemetry-collector-releases/cmd/goreleaser/internal"
 )
@@ -27,9 +27,14 @@ func main() {
 	project := internal.BuildDistribution(*distFlag, *contribBuildOrRestFlag)
 
 	os.Stdout.WriteString("# yaml-language-server: $schema=https://goreleaser.com/static/schema-pro.json\n")
-	e := yaml.NewEncoder(os.Stdout)
-	e.SetIndent(2)
-	if err := e.Encode(&project); err != nil {
+	d, err := yaml.NewDumper(os.Stdout, yaml.WithV3Defaults(), yaml.WithIndent(2), yaml.WithLineWidth(-1))
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := d.Dump(&project); err != nil {
+		log.Fatal(err)
+	}
+	if err := d.Close(); err != nil {
 		log.Fatal(err)
 	}
 }
